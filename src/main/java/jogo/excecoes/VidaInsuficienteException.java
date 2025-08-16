@@ -1,9 +1,7 @@
 package jogo.excecoes;
 
-/**
- * Exceção lançada quando há problemas com vidas do personagem
- * RuntimeException para erros que podem ser evitados
- */
+//Nâo Refatorada
+
 public class VidaInsuficienteException extends RuntimeException {
     
     private int vidasRestantes;

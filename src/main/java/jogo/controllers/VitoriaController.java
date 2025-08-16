@@ -13,6 +13,9 @@ public class VitoriaController {
 
     private static final String CAMINHO_MENU_PRINCIPAL = "/menu/menu-principal-view.fxml";
 
+    /**
+     * @param evento Evento de clique do JavaFX
+     */
     @FXML
     private void aoPressionarVoltarMenu(ActionEvent evento) {
         try {
@@ -23,7 +26,7 @@ public class VitoriaController {
 
             palco.setScene(new Scene(root));
             palco.show();
-            root.requestFocus();
+            root.requestFocus(); // Garante foco na nova cena
         } catch (IOException erro) {
             System.err.println("Erro ao carregar a tela do menu principal: " + erro.getMessage());
             erro.printStackTrace();

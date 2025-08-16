@@ -1,5 +1,7 @@
 package jogo.personagens;
 
+//Não Refatorado
+
 import jogo.modelo.enume.TipoPersonagem;
 import jogo.excecoes.PersonagemInvalidoException;
 import jogo.excecoes.VidaInsuficienteException;

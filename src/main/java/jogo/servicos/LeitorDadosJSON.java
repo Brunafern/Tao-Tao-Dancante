@@ -1,5 +1,7 @@
 package jogo.servicos;
 
+//Não Refatorado
+
 import jogo.modelo.DadosFase;
 import java.io.*;
 import java.nio.file.Files;

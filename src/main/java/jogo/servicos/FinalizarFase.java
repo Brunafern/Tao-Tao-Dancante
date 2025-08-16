@@ -1,5 +1,7 @@
 package jogo.servicos;
 
+//Não Refatorado
+
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

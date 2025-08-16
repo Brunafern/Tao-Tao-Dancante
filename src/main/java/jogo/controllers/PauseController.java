@@ -23,13 +23,18 @@ public class PauseController implements Initializable {
     @FXML
     private AnchorPane telaPause;
 
-
+    /**
+     * Define o Gestor de Pause responsável pelas ações de voltar, sair ou ir ao menu.
+     * @param gestorDePause Instância do GestorDePause.
+     */
     public void setGestorDePause(GestorDePause gestorDePause) {
+
         this.gestorDePause = gestorDePause;
     }
 
     /**
-     * ✨ NOVO: Define o MediaPlayer para controle de volume
+     * Define o MediaPlayer que será controlado pelo ControleVolume.
+     * @param reprodutorMidia MediaPlayer do JavaFX.
      */
     public void setReprodutorMidia(MediaPlayer reprodutorMidia) {
         this.reprodutorMidia = reprodutorMidia;
@@ -42,17 +47,19 @@ public class PauseController implements Initializable {
         }
     }
 
+    /**
+     * Método chamado automaticamente pelo JavaFX após a injeção do FXML.
+     * Inicializa a tela de pausa, criando o ControleVolume conectando o MediaPlayer
+     * @param location  URL usada para resolver caminhos relativos (geralmente não usado)
+     * @param resources Recursos localizados, se houver (geralmente não usado)
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("🎵 PauseController initialize() chamado!");
-        System.out.println("🎵 telaPause é null? " + (telaPause == null));
-
         if (telaPause != null) {
             criarEAdicionarControleVolume();
             conectarReprodutorMidiaSeDisponivel();
         }
     }
-
 
     private void criarEAdicionarControleVolume() {
         controleVolume = new ControleVolume();
@@ -61,30 +68,32 @@ public class PauseController implements Initializable {
         AnchorPane.setBottomAnchor(controleVolume, POSICAO_INFERIOR_CONTROLE_VOLUME);
 
         telaPause.getChildren().add(controleVolume);
-
-        System.out.println("🎵 Controle de volume adicionado à tela de pause no initialize()");
     }
-
 
     private void conectarReprodutorMidiaSeDisponivel() {
         if (reprodutorMidia != null) {
             controleVolume.setReprodutorMidia(reprodutorMidia);
-            System.out.println("🔗 MediaPlayer conectado ao controle de volume no initialize()");
         }
     }
 
     @FXML
     private void voltarAoJogo() {
+
         gestorDePause.voltar();
     }
 
+    /**
+     * @param evento Evento de ação do JavaFX.
+     */
     @FXML
     private void voltarAoMenu(ActionEvent evento) {
+
         gestorDePause.voltarParaMenu(evento);
     }
 
     @FXML
     private void sairDoJogo() {
+
         gestorDePause.sairDoJogo();
     }
 }
