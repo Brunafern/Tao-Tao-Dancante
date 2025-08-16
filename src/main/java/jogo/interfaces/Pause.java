@@ -1,5 +1,7 @@
 package jogo.interfaces;
 
+//Não Refatorado
+
 import javafx.event.ActionEvent;
 
 public interface Pause {

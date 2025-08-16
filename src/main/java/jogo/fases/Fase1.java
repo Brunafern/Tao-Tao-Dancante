@@ -11,7 +11,7 @@ import jogo.servicos.LeitorJSONSimples;
 
 public class Fase1 extends FaseBase {
 
-    // Constantes para as posições dos personagens (mantido para consistência)
+    // Constantes para as posições e dimensões dos personagens
     private static final double BARDO_POSICAO_X = 890.0;
     private static final double BARDO_POSICAO_Y = 335.0;
     private static final double LORDE_POSICAO_X = 120.0;
@@ -21,7 +21,7 @@ public class Fase1 extends FaseBase {
     private static final double LORDE_LARGURA = 210.0;
     private static final double LORDE_ALTURA = 380.0;
 
-    // Constantes para a lógica de spawn (backup)
+    // Constantes para lógica de spawn e animação de setas
     private static final double DURACAO_SPAWN_SETA_MILLIS = 1200.0;
     private static final double DURACAO_SUBIDA_INICIAL_BACKUP = 6000.0;
     private static final double DURACAO_SUBIDA_FINAL_BACKUP = 3000.0;
@@ -29,7 +29,7 @@ public class Fase1 extends FaseBase {
     private static final double DURACAO_APOS_ACELERACAO_BACKUP = 2500.0;
     private static final double TEMPO_ACELERACAO_MAXIMA_BACKUP = 74000.0;
 
-    // ✨ SIMPLIFICADO: Dados diretamente do JSON
+    // Dados carregados do JSON
     private String caminhoMusica;
     private String imagemBackground;
     private LeitorJSONSimples.ConfiguracoesTempo configuracoesTempo;
@@ -37,20 +37,15 @@ public class Fase1 extends FaseBase {
     private Timeline timelineSpawn;
 
     public Fase1() {
-        System.out.println("📖 Carregando Fase 1 diretamente do JSON...");
-
         this.caminhoMusica = LeitorJSONSimples.carregarCaminhoMusica(1);
         this.configuracoesTempo = LeitorJSONSimples.carregarConfiguracoesTempo(1);
         this.imagemBackground = "/assets/imagens/fase1.png";
-
-        System.out.println("✅ Fase 1 carregada com sucesso!");
-        System.out.println("🎵 Música: " + caminhoMusica);
     }
 
     @Override
     protected void inicializarBackground() {
+
         definirBackground(imagemBackground);
-        System.out.println("🖼️ Background carregado: " + imagemBackground);
     }
 
     @Override
@@ -81,9 +76,6 @@ public class Fase1 extends FaseBase {
         jogo.servicos.GerenciadorPersistenciaVolume persistencia = new jogo.servicos.GerenciadorPersistenciaVolume();
         double volumeSalvo = persistencia.carregarVolume();
         reprodutorMidia.setVolume(volumeSalvo);
-
-        System.out.println("🎵 Música carregada: " + caminhoMusica);
-        System.out.println("🔊 Volume aplicado: " + (int)(volumeSalvo * 100) + "%");
     }
 
     @Override
@@ -120,7 +112,9 @@ public class Fase1 extends FaseBase {
         );
     }
 
-
+    /**
+     * @return duração da animação da seta em milissegundos
+     */
     private double calcularDuracaoSeta() {
         if (reprodutorMidia == null) {
             return DURACAO_SUBIDA_INICIAL_BACKUP;
@@ -139,7 +133,4 @@ public class Fase1 extends FaseBase {
         return DURACAO_SUBIDA_INICIAL_BACKUP - ((DURACAO_SUBIDA_INICIAL_BACKUP - DURACAO_SUBIDA_FINAL_BACKUP) * progresso);
     }
 
-    public String obterInformacoesFase() {
-        return "Fase 1: Despertar do Bardo [FÁCIL]";
-    }
 }

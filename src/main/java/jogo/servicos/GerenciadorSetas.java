@@ -1,5 +1,7 @@
 package jogo.servicos;
 
+//Não Refatorado
+
 import javafx.animation.Animation;
 import javafx.animation.ParallelTransition;
 import javafx.animation.PauseTransition;

@@ -1,5 +1,7 @@
 package jogo.personagens;
 
+//Não refatorado
+
 import jogo.modelo.enume.TipoPersonagem;
 import jogo.excecoes.PersonagemInvalidoException;
 import javafx.animation.KeyFrame;

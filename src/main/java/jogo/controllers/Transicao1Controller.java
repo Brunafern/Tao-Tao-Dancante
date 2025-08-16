@@ -15,6 +15,9 @@ public class Transicao1Controller {
     private static final String CAMINHO_MENU_PRINCIPAL = "/menu/menu-principal-view.fxml";
     private static final int NUMERO_FASE_INICIAL = 1;
 
+    /**
+     * @param evento Evento de clique do JavaFX
+     */
     @FXML
     private void aoPressionarVoltarMenu(ActionEvent evento) {
         try {
@@ -32,6 +35,9 @@ public class Transicao1Controller {
         }
     }
 
+    /**
+     * @param evento Evento de clique do JavaFX
+     */
     @FXML
     private void aoPressionarComecarJogo(ActionEvent evento) {
         try {

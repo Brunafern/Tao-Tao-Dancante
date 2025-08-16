@@ -10,14 +10,9 @@ import jogo.personagens.Lorde;
 import jogo.servicos.LeitorDadosJSON;
 import jogo.modelo.DadosFase;
 
-/**
- * ✨ FASE GENÉRICA
- * Pode carregar qualquer fase baseada no número fornecido
- * Substitui a necessidade de criar Fase1, Fase2, Fase3, etc.
- */
 public class FaseGenerica extends FaseBase {
 
-    // Constantes para as posições dos personagens
+    // Constantes para as posições e tamanhos dos personagens
     private static final double BARDO_POSICAO_X = 890.0;
     private static final double BARDO_POSICAO_Y = 335.0;
     private static final double BARDO_LARGURA = 282.0;
@@ -31,12 +26,12 @@ public class FaseGenerica extends FaseBase {
     // Constante para a duração do spawn de setas
     private static final double DURACAO_SPAWN_SETA_MILLIS = 1200.0;
 
-    private final int numeroFase;
-    private DadosFase dadosFase;
-    private Timeline timelineSpawn;
+    private final int numeroFase;         // Número da fase a ser carregada
+    private DadosFase dadosFase;          // Dados carregados do JSON ou fallback
+    private Timeline timelineSpawn;       // Timeline responsável pelo spawn de setas
 
     /**
-     * Construtor que recebe o número da fase
+     * @param numeroFase Número da fase a ser carregada
      */
     public FaseGenerica(int numeroFase) {
         this.numeroFase = numeroFase;
@@ -44,6 +39,7 @@ public class FaseGenerica extends FaseBase {
         System.out.println("📖 Carregando Fase " + numeroFase + " do JSON...");
 
         try {
+            // Tenta carregar dados da fase a partir de um JSON
             this.dadosFase = LeitorDadosJSON.carregarFaseDoJSON(numeroFase);
             System.out.println("✅ " + dadosFase.toString());
         } catch (Exception e) {
@@ -52,12 +48,7 @@ public class FaseGenerica extends FaseBase {
         }
     }
 
-    /**
-     * Fallback para carregar dados básicos se JSON não funcionar
-     */
     private void carregarDadosDeFallback() {
-        System.out.println("⚠️ Usando dados básicos para fase " + numeroFase);
-
         String caminhoMusica = String.format("/assets/musica/song%d.mp3", numeroFase);
         String caminhoBackground = String.format("/assets/imagens/fase%d.png", numeroFase);
 
@@ -73,15 +64,14 @@ public class FaseGenerica extends FaseBase {
                 "/assets/persona/bardoDance1.png",
                 "/assets/persona/lordBarra.png",
                 caminhoBackground,
-                6000.0 - (numeroFase - 1) * 1000,
-                3000.0 - (numeroFase - 1) * 500,
-                30000.0 - (numeroFase - 1) * 5000
+                6000.0 - (numeroFase - 1) * 1000, // duração inicial das setas
+                3000.0 - (numeroFase - 1) * 500,  // duração final das setas
+                30000.0 - (numeroFase - 1) * 5000 // tempo de aceleração
         );
     }
 
     @Override
     protected void inicializarBackground() {
-        // ✨ USA BACKGROUND DA FASE CARREGADA
         definirBackground(dadosFase.getImagemBackground());
         System.out.println("🖼️ Background carregado: " + dadosFase.getImagemBackground());
     }
@@ -89,7 +79,6 @@ public class FaseGenerica extends FaseBase {
     @Override
     protected void inicializarPersonagens() {
         try {
-            // ✨ USA IMAGENS DOS PERSONAGENS DA FASE CARREGADA
             bardo = new Bardo(BARDO_LARGURA, BARDO_ALTURA);
             bardo.setLayoutX(BARDO_POSICAO_X);
             bardo.setLayoutY(BARDO_POSICAO_Y);
@@ -108,12 +97,11 @@ public class FaseGenerica extends FaseBase {
 
     @Override
     protected void inicializarMusica() {
-        // ✨ USA MÚSICA DA FASE CARREGADA
         String musicaPath = getClass().getResource(dadosFase.getCaminhoMusica()).toExternalForm();
         Media media = new Media(musicaPath);
         reprodutorMidia = new MediaPlayer(media);
 
-        // ✨ APLICA VOLUME SALVO IMEDIATAMENTE
+        // Aplica o volume salvo
         jogo.servicos.GerenciadorPersistenciaVolume persistencia = new jogo.servicos.GerenciadorPersistenciaVolume();
         double volumeSalvo = persistencia.carregarVolume();
         reprodutorMidia.setVolume(volumeSalvo);
@@ -127,20 +115,15 @@ public class FaseGenerica extends FaseBase {
         pontuacao = dadosFase.getPesoPontuacao() * 0.5;
 
         gerenciadorSetas.carregarDadosDaFase(numeroFase);
-
         gerenciadorSetas.setFornecedorDuracaoAnimacao(this::calcularDuracaoSeta);
         gerenciadorSetas.setAtualizadorPontuacao(this::atualizarPontuacao);
         gerenciadorSetas.setAcaoAoIniciarSetas(this::iniciarSpawnSetas);
-
         gerenciadorSetas.iniciar();
 
         System.out.println("🎯 Fase " + numeroFase + " iniciada!");
         System.out.println("📊 Peso da pontuação: " + dadosFase.getPesoPontuacao() + "x");
     }
 
-    /**
-     * ✨ CALCULA DURAÇÃO DAS SETAS BASEADO NA FASE
-     */
     private Double calcularDuracaoSeta() {
         if (reprodutorMidia == null) return dadosFase.getDuracaoSetasInicial();
 
@@ -150,9 +133,6 @@ public class FaseGenerica extends FaseBase {
         return tempoAtual >= tempoAceleracao ? dadosFase.getDuracaoSetasFinal() : dadosFase.getDuracaoSetasInicial();
     }
 
-    /**
-     * ✨ INICIA O SPAWN DE SETAS
-     */
     private void iniciarSpawnSetas() {
         gerenciadorSetas.pararSetas();
 
@@ -165,9 +145,6 @@ public class FaseGenerica extends FaseBase {
         timelineSpawn.play();
     }
 
-    /**
-     * Ajusta a velocidade de spawn de setas com base no tempo da música.
-     */
     private void ajustarVelocidadeSpawn() {
         if (reprodutorMidia == null) return;
 
@@ -183,11 +160,4 @@ public class FaseGenerica extends FaseBase {
         }
     }
 
-    /**
-     * Obtém o número da fase
-     * @return O número da fase.
-     */
-    public int getNumeroFase() {
-        return numeroFase;
-    }
 }

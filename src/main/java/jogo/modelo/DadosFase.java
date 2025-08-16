@@ -1,8 +1,7 @@
 package jogo.modelo;
 
-/**
- * ✨ DADOS ÚNICOS E IMUTÁVEIS DE CADA FASE
- */
+//Não Refatorado
+
 public final class DadosFase {
 
     private final int numeroFase;

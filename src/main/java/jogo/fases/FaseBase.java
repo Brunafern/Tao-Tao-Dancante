@@ -11,28 +11,28 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
+import javafx.stage.Stage;
 import jogo.componentes.PlacarDeVida;
 import jogo.personagens.Bardo;
 import jogo.personagens.Lorde;
 import jogo.servicos.GerenciadorSetas;
 import jogo.servicos.GestorDePause;
 import jogo.servicos.FinalizarFase;
-import javafx.stage.Stage;
 
 public abstract class FaseBase {
 
-    // Constantes para as dimensões e configurações da tela
+    // Constantes para imagens de feedback
     private static final double ALTURA_IMAGEM_ERRO = 100.0;
     private static final double LARGURA_IMAGEM_ERRO = 100.0;
     private static final Duration DURACAO_IMAGEM_ERRO = Duration.millis(500);
 
-    // Dimensões e posicionamento da zona de acerto
+    // Dimensões e posição da zona de acerto
     private static final double LARGURA_ZONA_ACERTO = (3 * 165) + 190;
     private static final double ALTURA_ZONA_ACERTO = 130;
     private static final double POSICAO_X_ZONA_ACERTO = 300;
     private static final double POSICAO_Y_ZONA_ACERTO = 15;
 
-    // Dimensões e posicionamento do placar de vida
+    // Dimensões e posição do placar de vida
     private static final double POSICAO_X_PLACAR = 400;
     private static final double POSICAO_Y_PLACAR = 700;
 
@@ -56,6 +56,9 @@ public abstract class FaseBase {
     private ImageView imagemErro;
     private ImageView imagemMiss;
 
+    /**
+     * Método chamado automaticamente pelo FXML após a criação da cena.
+     */
     @FXML
     protected void initialize() {
         inicializarComponentesDaFase();
@@ -63,9 +66,6 @@ public abstract class FaseBase {
         iniciarFase();
     }
 
-    /**
-     * Inicializa todos os componentes visuais e de lógica da fase.
-     */
     protected void inicializarComponentesDaFase() {
         inicializarBackground();
         inicializarPersonagens();
@@ -75,11 +75,15 @@ public abstract class FaseBase {
         inicializarGerenciadorSetas();
     }
 
+    // Métodos abstratos obrigatórios para implementação específica de cada fase
     protected abstract void inicializarBackground();
     protected abstract void inicializarPersonagens();
     protected abstract void inicializarMusica();
     protected abstract void iniciarFase();
 
+    /**
+     * @param caminhoRelativo Caminho relativo para o arquivo de imagem.
+     */
     protected void definirBackground(String caminhoRelativo) {
         Image imagem = new Image(getClass().getResourceAsStream(caminhoRelativo));
         background.setImage(imagem);
@@ -104,6 +108,7 @@ public abstract class FaseBase {
         gerenciadorSetas = new GerenciadorSetas(telaFase, zonaAcerto, reprodutorMidia, placarDeVida, this::verificarResultadoFinal);
         gerenciadorSetas.setAcaoErro(this::exibirImagemErro);
         gerenciadorSetas.setAcaoMiss(this::exibirImagemMiss);
+
         gestorDePause = GestorDePause.getInstance(
                 telaFase,
                 bardo.getAnimacao(),
@@ -119,9 +124,7 @@ public abstract class FaseBase {
         Platform.runLater(telaFase::requestFocus);
 
         telaFase.setOnKeyPressed(evento -> {
-            if (jogoFinalizado) {
-                return;
-            }
+            if (jogoFinalizado) return;
 
             if (evento.getCode() == KeyCode.ESCAPE) {
                 if (gestorDePause.estaPausado()) {
@@ -154,14 +157,15 @@ public abstract class FaseBase {
         finalizarFase(venceu);
     }
 
+    /**
+     * @param vitoria true se o jogador venceu, false se perdeu
+     */
     protected void finalizarFase(boolean vitoria) {
         if (jogoFinalizado) return;
         jogoFinalizado = true;
 
         gerenciadorSetas.setJogoTerminou(true);
-        if (reprodutorMidia != null) {
-            reprodutorMidia.stop();
-        }
+        if (reprodutorMidia != null) reprodutorMidia.stop();
         gerenciadorSetas.pararSetas();
 
         Stage palco = (Stage) telaFase.getScene().getWindow();
@@ -170,39 +174,28 @@ public abstract class FaseBase {
         }
     }
 
-    protected void exibirImagemErro() {
-        if (imagemErro != null) return;
+    // Feedback visual de erro ou miss
+    protected void exibirImagemErro() { exibirImagemFeedback("/assets/erro/erro.png", true); }
+    protected void exibirImagemMiss() { exibirImagemFeedback("/assets/erro/miss.png", false); }
+
+    private void exibirImagemFeedback(String caminho, boolean isErro) {
+        ImageView imagem = isErro ? imagemErro : imagemMiss;
+        if (imagem != null) return;
 
         try {
-            imagemErro = criarImagemFeedback("/assets/erro/erro.png");
-            telaFase.getChildren().add(imagemErro);
+            imagem = criarImagemFeedback(caminho);
+            telaFase.getChildren().add(imagem);
+            configurarTransicaoDesaparecimento(imagem);
 
-            configurarTransicaoDesaparecimento(imagemErro);
+            if (isErro) imagemErro = imagem;
+            else imagemMiss = imagem;
+
         } catch (Exception e) {
-            System.err.println("Erro ao carregar a imagem de erro: " + e.getMessage());
+            System.err.println("Erro ao carregar a imagem de feedback: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    protected void exibirImagemMiss() {
-        if (imagemMiss != null) return;
-
-        try {
-            imagemMiss = criarImagemFeedback("/assets/erro/miss.png");
-            telaFase.getChildren().add(imagemMiss);
-
-            configurarTransicaoDesaparecimento(imagemMiss);
-        } catch (Exception e) {
-            System.err.println("Erro ao carregar a imagem de miss: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Cria uma ImageView centralizada na tela com base em um caminho de imagem.
-     * @param caminho O caminho do recurso da imagem.
-     * @return Uma ImageView configurada.
-     */
     private ImageView criarImagemFeedback(String caminho) {
         Image imagem = new Image(getClass().getResourceAsStream(caminho));
         ImageView imageView = new ImageView(imagem);
@@ -217,19 +210,12 @@ public abstract class FaseBase {
         return imageView;
     }
 
-    /**
-     * Configura e inicia a transição de desaparecimento para uma imagem.
-     * @param imageView A ImageView que desaparecerá.
-     */
     private void configurarTransicaoDesaparecimento(ImageView imageView) {
         PauseTransition pt = new PauseTransition(DURACAO_IMAGEM_ERRO);
         pt.setOnFinished(e -> {
             telaFase.getChildren().remove(imageView);
-            if (imageView == imagemErro) {
-                imagemErro = null;
-            } else if (imageView == imagemMiss) {
-                imagemMiss = null;
-            }
+            if (imageView == imagemErro) imagemErro = null;
+            else if (imageView == imagemMiss) imagemMiss = null;
         });
         pt.play();
     }

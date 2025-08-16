@@ -1,9 +1,7 @@
 package jogo.excecoes;
 
-/**
- * Exceção lançada quando um personagem é inválido
- * Demonstra conceito de exceções customizadas para POO
- */
+//Nâo Refatorada
+
 public class PersonagemInvalidoException extends Exception {
     
     private String tipoPersonagem;
@@ -12,7 +10,7 @@ public class PersonagemInvalidoException extends Exception {
     public PersonagemInvalidoException(String mensagem) {
         super("Erro de personagem: " + mensagem);
     }
-    
+
     public PersonagemInvalidoException(String mensagem, String tipoPersonagem) {
         super("Erro de personagem: " + mensagem);
         this.tipoPersonagem = tipoPersonagem;

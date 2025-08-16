@@ -1,5 +1,7 @@
 package jogo.servicos;
 
+//Não Refatorado
+
 import java.util.prefs.Preferences;
 
 /**

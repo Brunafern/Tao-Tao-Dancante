@@ -1,5 +1,7 @@
 package jogo.modelo.enume;
 
+//Não Refatorado
+
 public enum TipoPersonagem {
     BARDO("Bardo", "Personagem músico com ritmo especial", 15),
     FADA("Fada", "Personagem mágico e gracioso", 12),

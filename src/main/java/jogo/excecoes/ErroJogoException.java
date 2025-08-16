@@ -1,8 +1,6 @@
 package jogo.excecoes;
 
-/**
- * Exceção personalizada para representar erros durante o gameplay do jogo.
- */
+//Nâo Refatorada
 
 public class ErroJogoException extends Exception {
 

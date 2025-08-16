@@ -6,18 +6,16 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import jogo.fases.FaseGenerica;
 
-
- //CONTROLADOR DE FASES GENÉRICO
-
 public class FaseController {
 
     private static final int NUMERO_MAXIMO_FASES = 3;
     private static final String TITULO_JANELA_BASE = "Tao Tao Dancante - Fase ";
     private static final String CAMINHO_VIEW_FASES = "/fases/fase-view.fxml";
 
-
-     //Carrega qualquer fase pelo número
-
+    /**
+     * @param stage Janela principal do JavaFX.
+     * @param numeroFase Número da fase a ser carregada.
+     */
     public void carregarFase(Stage stage, int numeroFase) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(CAMINHO_VIEW_FASES));
@@ -30,36 +28,16 @@ public class FaseController {
             stage.setScene(scene);
             stage.show();
 
-
         } catch (Exception e) {
             System.err.println("Erro ao carregar fase " + numeroFase + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    //METODO ESPECÍFICO: Carrega Fase 1 (mantido para compatibilidade)
-
-    public void carregarFase1(Stage stage) {
-        carregarFase(stage, 1);
-    }
-
-
-     //METODO ESPECÍFICO: Carrega Fase 2
-
-    public void carregarFase2(Stage stage) {
-        carregarFase(stage, 2);
-    }
-
-
-     //METODO ESPECÍFICO: Carrega Fase 3
-
-    public void carregarFase3(Stage stage) {
-        carregarFase(stage, 3);
-    }
-
-
-    //METODO UTILITÁRIO: Carrega próxima fase
-
+    /**
+     * @param stage Janela principal do JavaFX.
+     * @param faseAtual Número da fase atualmente ativa.
+     */
     public void carregarProximaFase(Stage stage, int faseAtual) {
         int proximaFase = faseAtual + 1;
 
@@ -70,8 +48,4 @@ public class FaseController {
         }
     }
 
-    // lista fases disponíveis (PRO FUTURO)
-    public void listarFasesDisponiveis() {
-
-    }
 }
