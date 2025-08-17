@@ -1,14 +1,12 @@
 package jogo.personagens;
 
-import jogo.modelo.enume.TipoPersonagem;
-import jogo.excecoes.PersonagemInvalidoException;
 import javafx.scene.image.Image;
+import jogo.excecoes.PlacarDeVidaException;
+import jogo.excecoes.PersonagemInvalidoException;
+
 import java.util.Objects;
 
 public class Lorde extends PersonagemJogo {
-
-    private int pontosPrecisao;
-    private boolean posturaElegante;
 
     private final Image imgPensador;
     private final Image imgRaiva;
@@ -17,13 +15,10 @@ public class Lorde extends PersonagemJogo {
     /**
      * @param width  largura do personagem em pixels
      * @param height altura do personagem em pixels
-     * @throws PersonagemInvalidoException se algum parâmetro for inválido
+     * @throws PlacarDeVidaException se algum parâmetro for inválido
      */
-    public Lorde(double width, double height) throws PersonagemInvalidoException {
-        super("Lorde", TipoPersonagem.LORDE, width, height);
-
-        this.pontosPrecisao = 15;
-        this.posturaElegante = true;
+    public Lorde(double width, double height) throws PersonagemInvalidoException,PlacarDeVidaException {
+    super("Lorde", width, height);
 
         imgPensador = new Image(Objects.requireNonNull(
                 getClass().getResource("/assets/persona/lordThinker.png")).toExternalForm());
@@ -47,7 +42,6 @@ public class Lorde extends PersonagemJogo {
      */
     public void ficarComRaiva() {
         this.setImage(imgRaiva);
-        this.posturaElegante = false;
     }
 
     /**
@@ -55,7 +49,6 @@ public class Lorde extends PersonagemJogo {
      */
     public void ficarFeliz() {
         this.setImage(imgFeliz);
-        this.posturaElegante = true;
     }
 
 }

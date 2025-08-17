@@ -12,14 +12,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import jogo.controllers.PauseController;
+import jogo.excecoes.RecursoException;
+import jogo.excecoes.FluxoException;
 import javafx.event.ActionEvent;
 import java.io.IOException;
 import java.util.List;
 import jogo.componentes.Setas;
-import jogo.interfaces.Pause;
 
-
-public class GestorDePause implements Pause {
+public class GestorDePause {
 
     private static GestorDePause instancia;
 
@@ -42,9 +42,9 @@ public class GestorDePause implements Pause {
      * @param acaoRetornarJogo ação a ser executada ao retornar ao jogo
      * @param gerenciadorSetas gerenciador de setas
      */
-    private GestorDePause(Pane painelPrincipal, Timeline animacoes, MediaPlayer reprodutorMidia,
-                          List<Setas> setasAtivas, Runnable acaoRetornarJogo,
-                          GerenciadorSetas gerenciadorSetas) {
+    public GestorDePause(Pane painelPrincipal, Timeline animacoes, MediaPlayer reprodutorMidia,
+            List<Setas> setasAtivas, Runnable acaoRetornarJogo,
+            GerenciadorSetas gerenciadorSetas) {
         this.painelPrincipal = painelPrincipal;
         this.animacoes = animacoes;
         this.reprodutorMidia = reprodutorMidia;
@@ -53,19 +53,20 @@ public class GestorDePause implements Pause {
     }
 
     /**
-     * @param painelPrincipal painel principal do jogo
-     * @param animacoes animações em execução
-     * @param reprodutorMidia reprodutor de música
-     * @param setasAtivas lista de setas ativas
+     * @param painelPrincipal  painel principal do jogo
+     * @param animacoes        animações em execução
+     * @param reprodutorMidia  reprodutor de música
+     * @param setasAtivas      lista de setas ativas
      * @param acaoRetornarJogo ação ao retornar ao jogo
      * @param gerenciadorSetas gerenciador de setas
      * @return instância única de {@link GestorDePause}
      */
     public static GestorDePause getInstance(Pane painelPrincipal, Timeline animacoes, MediaPlayer reprodutorMidia,
-                                            List<Setas> setasAtivas, Runnable acaoRetornarJogo,
-                                            GerenciadorSetas gerenciadorSetas) {
+            List<Setas> setasAtivas, Runnable acaoRetornarJogo,
+            GerenciadorSetas gerenciadorSetas) {
         if (instancia == null) {
-            instancia = new GestorDePause(painelPrincipal, animacoes, reprodutorMidia, setasAtivas, acaoRetornarJogo, gerenciadorSetas);
+            instancia = new GestorDePause(painelPrincipal, animacoes, reprodutorMidia, setasAtivas, acaoRetornarJogo,
+                    gerenciadorSetas);
         }
         return instancia;
     }
@@ -74,8 +75,7 @@ public class GestorDePause implements Pause {
      * Pausa o jogo, incluindo animações, áudio e spawn de setas,
      * além de exibir a tela de pausa.
      */
-    @Override
-    public void pause() {
+    public void pause() throws RecursoException {
         if (!jogoPausado) {
             pausarAnimacoesEAudio();
             pausarGerenciadorSetas();
@@ -112,7 +112,7 @@ public class GestorDePause implements Pause {
         }
     }
 
-    private void exibirTelaDePause() {
+    private void exibirTelaDePause() throws RecursoException{
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(CAMINHO_TELA_PAUSE));
             telaPause = fxmlLoader.load();
@@ -123,14 +123,13 @@ public class GestorDePause implements Pause {
 
             painelPrincipal.getChildren().add(telaPause);
         } catch (IOException e) {
-            System.err.println("❌ Erro ao carregar a tela de pause: " + e.getMessage());
-            e.printStackTrace();
+            throw new RecursoException("Erro ao carregar a tela de pause: " + e.getMessage(), e);
         }
     }
 
-    @Override
     public void voltar() {
-        if (!jogoPausado) return;
+        if (!jogoPausado)
+            return;
 
         retomarAnimacoesEAudio();
         retomarGerenciadorSetas();
@@ -177,7 +176,6 @@ public class GestorDePause implements Pause {
     /**
      * @return {true} se o jogo estiver pausado, {false} caso contrário.
      */
-    @Override
     public boolean estaPausado() {
         return jogoPausado;
     }
@@ -185,8 +183,7 @@ public class GestorDePause implements Pause {
     /**
      * @param evento evento disparado pelo botão de voltar
      */
-    @Override
-    public void voltarParaMenu(ActionEvent evento) {
+    public void voltarParaMenu(ActionEvent evento) throws RecursoException, FluxoException {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(CAMINHO_MENU_PRINCIPAL));
             Parent root = fxmlLoader.load();
@@ -195,13 +192,19 @@ public class GestorDePause implements Pause {
             palco.setScene(new Scene(root));
             palco.show();
         } catch (IOException erro) {
-            System.err.println("❌ Erro ao carregar a tela do menu principal: " + erro.getMessage());
-            erro.printStackTrace();
+            throw new RecursoException("Erro ao carregar a tela do menu principal: " + erro.getMessage(), erro);
+        } catch (Exception e) {
+            throw new FluxoException("Erro inesperado ao tentar voltar para o menu: " + e.getMessage(), e);
         }
     }
 
-    @Override
-    public void sairDoJogo() {
-        System.exit(0);
+    public void sairDoJogo() throws RecursoException, FluxoException {
+        try {
+            System.exit(0);
+        } catch (SecurityException e) {
+            throw new RecursoException("Erro ao tentar sair do jogo: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new FluxoException("Erro inesperado ao tentar sair do jogo: " + e.getMessage(), e);
+        }
     }
 }

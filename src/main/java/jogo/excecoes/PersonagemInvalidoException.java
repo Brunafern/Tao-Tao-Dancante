@@ -1,7 +1,5 @@
 package jogo.excecoes;
 
-//Nâo Refatorada
-
 public class PersonagemInvalidoException extends Exception {
     
     private String tipoPersonagem;

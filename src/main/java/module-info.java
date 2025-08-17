@@ -3,15 +3,13 @@ module demo {
     requires javafx.fxml;
     requires javafx.media;
     requires java.desktop;
-    requires java.prefs; // ✨ NOVO: Para salvar configurações no SO
+    requires java.prefs; 
 
     exports jogo.controllers;
     exports jogo.fases;
     exports jogo.personagens;
-    exports jogo.interfaces;
     exports jogo.componentes;
     exports jogo.servicos;
-    exports jogo.modelo.enume;
     exports jogo.excecoes;
     exports principal;
 

@@ -9,6 +9,8 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import jogo.servicos.GerenciadorPersistenciaVolume;
+import jogo.excecoes.PersistenciaDadosException;
+import jogo.excecoes.ArquivoException;
 import java.util.Objects;
 
 public class ControleVolume extends StackPane {
@@ -61,7 +63,6 @@ public class ControleVolume extends StackPane {
     private Rectangle criarBarraFundo() {
         Rectangle fundo = new Rectangle(LARGURA_TOTAL, ALTURA_TOTAL);
         fundo.setFill(Color.web(COR_FUNDO_BARRA));
-        fundo.setStroke(Color.DARKGRAY);
         fundo.setStrokeWidth(1);
         return fundo;
     }
@@ -83,7 +84,12 @@ public class ControleVolume extends StackPane {
         ImageView icone = new ImageView();
         icone.setFitHeight(ALTURA_ICONE);
         icone.setFitWidth(LARGURA_ICONE);
-        atualizarImagemIconeVolume();
+        this.iconeVolume = icone;
+        try {
+            atualizarImagemIconeVolume();
+        } catch (ArquivoException e) {
+            System.err.println(e.getMessage());
+        }
 
         // Clique no ícone alterna entre mudo e volume máximo
         icone.setOnMouseClicked(event -> {
@@ -104,16 +110,20 @@ public class ControleVolume extends StackPane {
 
     private void atualizarVisualBarra() {
         barraPreenchimento.setWidth(LARGURA_TOTAL * volumeAtual);
-        atualizarImagemIconeVolume();
+        try {
+            atualizarImagemIconeVolume();
+        } catch (ArquivoException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
-    private void atualizarImagemIconeVolume() {
+    private void atualizarImagemIconeVolume() throws ArquivoException {
         String caminhoIcone = obterCaminhoIcone();
         try {
             Image novaImagem = new Image(Objects.requireNonNull(getClass().getResource(caminhoIcone)).toExternalForm());
             iconeVolume.setImage(novaImagem);
         } catch (NullPointerException | IllegalArgumentException erro) {
-            System.err.println("Erro ao carregar imagem do ícone de volume: " + caminhoIcone);
+            throw new ArquivoException("Erro ao carregar imagem do ícone de volume: " + caminhoIcone, erro);
         }
     }
 
@@ -166,6 +176,10 @@ public class ControleVolume extends StackPane {
         if (reprodutorMidia != null) {
             reprodutorMidia.setVolume(this.volumeAtual);
         }
-        gerenciadorPersistencia.salvarVolume(this.volumeAtual);
+        try {
+            gerenciadorPersistencia.salvarVolume(this.volumeAtual);
+    } catch (PersistenciaDadosException e) {
+            System.err.println("Erro ao salvar volume: " + e.getMessage());
+        }
     }
 }

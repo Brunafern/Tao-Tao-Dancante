@@ -8,6 +8,7 @@ import javafx.util.Duration;
 import jogo.personagens.Bardo;
 import jogo.personagens.Lorde;
 import jogo.servicos.LeitorJSONSimples;
+import jogo.excecoes.ArquivoException;
 
 public class Fase1 extends FaseBase {
 
@@ -36,9 +37,15 @@ public class Fase1 extends FaseBase {
 
     private Timeline timelineSpawn;
 
-    public Fase1() {
-        this.caminhoMusica = LeitorJSONSimples.carregarCaminhoMusica(1);
-        this.configuracoesTempo = LeitorJSONSimples.carregarConfiguracoesTempo(1);
+    public Fase1() throws jogo.excecoes.FluxoException {
+        try {
+            this.caminhoMusica = LeitorJSONSimples.carregarCaminhoMusica(1);
+            this.configuracoesTempo = LeitorJSONSimples.carregarConfiguracoesTempo(1);
+    } catch (ArquivoException e) {
+            System.err.println("Erro ao carregar dados da fase 1: " + e.getMessage());
+        } catch (Exception e) {
+            throw new jogo.excecoes.FluxoException("Erro ao inicializar Fase 1", e);
+        }
         this.imagemBackground = "/assets/imagens/fase1.png";
     }
 
@@ -55,15 +62,14 @@ public class Fase1 extends FaseBase {
             bardo.setLayoutX(BARDO_POSICAO_X);
             bardo.setLayoutY(BARDO_POSICAO_Y);
             telaFase.getChildren().add(bardo);
-            System.out.println("🎭 Bardo carregado");
 
             lorde = new Lorde(LORDE_LARGURA, LORDE_ALTURA);
             lorde.setLayoutX(LORDE_POSICAO_X);
             lorde.setLayoutY(LORDE_POSICAO_Y);
             telaFase.getChildren().add(lorde);
-            System.out.println("👑 Lorde carregado");
+
         } catch (Exception e) {
-            System.err.println("❌ Erro ao criar personagens: " + e.getMessage());
+            System.err.println(" Erro ao criar personagens: " + e.getMessage());
         }
     }
 
@@ -87,7 +93,12 @@ public class Fase1 extends FaseBase {
         gerenciadorSetas.setAtualizadorPontuacao(this::atualizarPontuacao);
         gerenciadorSetas.setAcaoAoIniciarSetas(this::iniciarSpawnSetas);
 
-        gerenciadorSetas.iniciar();
+        try {
+            gerenciadorSetas.iniciar();
+    } catch (jogo.excecoes.FluxoException e) {
+            System.err.println("Erro ao iniciar gerenciador de setas: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void iniciarSpawnSetas() {

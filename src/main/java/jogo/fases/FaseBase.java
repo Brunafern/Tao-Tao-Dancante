@@ -61,18 +61,27 @@ public abstract class FaseBase {
      */
     @FXML
     protected void initialize() {
+    try {
         inicializarComponentesDaFase();
-        configurarTeclado();
-        iniciarFase();
+    } catch (jogo.excecoes.FluxoException e) {
+        System.err.println("Erro ao inicializar componentes da fase: " + e.getMessage());
+        e.printStackTrace();
     }
+    configurarTeclado();
+    iniciarFase();
+}
 
-    protected void inicializarComponentesDaFase() {
-        inicializarBackground();
-        inicializarPersonagens();
-        inicializarZonaAcerto();
-        inicializarPlacar();
-        inicializarMusica();
-        inicializarGerenciadorSetas();
+    protected void inicializarComponentesDaFase() throws jogo.excecoes.FluxoException{
+      try {
+            inicializarBackground();
+            inicializarPersonagens();
+            inicializarZonaAcerto();
+            inicializarPlacar();
+            inicializarMusica();
+            inicializarGerenciadorSetas();
+        } catch (Exception e) {
+            throw new jogo.excecoes.FluxoException("Erro ao inicializar componentes da fase", e);
+        }
     }
 
     // Métodos abstratos obrigatórios para implementação específica de cada fase
@@ -105,18 +114,18 @@ public abstract class FaseBase {
     }
 
     protected void inicializarGerenciadorSetas() {
-        gerenciadorSetas = new GerenciadorSetas(telaFase, zonaAcerto, reprodutorMidia, placarDeVida, this::verificarResultadoFinal);
+        gerenciadorSetas = new GerenciadorSetas(telaFase, zonaAcerto, reprodutorMidia, this::verificarResultadoFinal);
         gerenciadorSetas.setAcaoErro(this::exibirImagemErro);
         gerenciadorSetas.setAcaoMiss(this::exibirImagemMiss);
 
-        gestorDePause = GestorDePause.getInstance(
-                telaFase,
-                bardo.getAnimacao(),
-                reprodutorMidia,
-                gerenciadorSetas.getSetasAtivas(),
-                gerenciadorSetas::gerarSeta,
-                gerenciadorSetas
-        );
+    gestorDePause = new GestorDePause(
+        telaFase,
+        bardo.getAnimacao(),
+        reprodutorMidia,
+        gerenciadorSetas.getSetasAtivas(),
+        gerenciadorSetas::gerarSeta,
+        gerenciadorSetas
+    );
     }
 
     protected void configurarTeclado() {
@@ -130,7 +139,12 @@ public abstract class FaseBase {
                 if (gestorDePause.estaPausado()) {
                     gestorDePause.voltar();
                 } else {
-                    gestorDePause.pause();
+                    try {
+                        gestorDePause.pause();
+                    } catch (jogo.excecoes.RecursoException e) {
+                        System.err.println("Erro ao pausar o jogo: " + e.getMessage());
+                        e.printStackTrace();
+                    }
                 }
             } else {
                 gerenciadorSetas.processarTecla(evento.getCode());
@@ -170,7 +184,15 @@ public abstract class FaseBase {
 
         Stage palco = (Stage) telaFase.getScene().getWindow();
         if (palco != null) {
-            FinalizarFase.finalizarFase(palco, vitoria);
+            try {
+                FinalizarFase.finalizarFase(palco, vitoria);
+            } catch (jogo.excecoes.RecursoException e) {
+                System.err.println("Erro ao finalizar fase: " + e.getMessage());
+                e.printStackTrace();
+            } catch (jogo.excecoes.FluxoException e) {
+                System.err.println("Erro inesperado ao finalizar fase: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 

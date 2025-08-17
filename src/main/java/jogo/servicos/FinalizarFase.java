@@ -1,5 +1,7 @@
 package jogo.servicos;
 
+import jogo.excecoes.RecursoException;
+import jogo.excecoes.FluxoException;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,18 +14,25 @@ import javafx.util.Duration;
 public class FinalizarFase {
 
     /**
-     * @param stage  palco principal da aplicação (onde a cena será carregada).
+     * @param stage   palco principal da aplicação (onde a cena será carregada).
      * @param vitoria true se o jogador venceu a fase, false caso tenha perdido.
      */
-    public static void finalizarFase(Stage stage, boolean vitoria) {
-        tocarSom(vitoria);
-        carregarTelaFinal(stage, vitoria);
+    public static void finalizarFase(Stage stage, boolean vitoria) throws RecursoException, FluxoException {
+        try {
+            tocarSom(vitoria);
+            carregarTelaFinal(stage, vitoria);
+    } catch (RecursoException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FluxoException("Erro inesperado ao finalizar fase", e);
+        }
     }
 
     /**
-     * @param vitoria true para tocar música de vitória, false para música de derrota.
+     * @param vitoria true para tocar música de vitória, false para música de
+     *                derrota.
      */
-    private static void tocarSom(boolean vitoria) {
+    private static void tocarSom(boolean vitoria) throws RecursoException {
         String soundFile = vitoria ? "victory-.mp3" : "losetrumpet.mp3";
         try {
             String soundPath = FinalizarFase.class
@@ -34,15 +43,16 @@ public class FinalizarFase {
             MediaPlayer player = new MediaPlayer(media);
             player.play();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RecursoException("Erro ao tocar som de finalização: " + e.getMessage(), e);
         }
     }
 
     /**
      * @param stage   palco principal da aplicação.
-     * @param vitoria true para carregar a tela de vitória, false para tela de derrota.
+     * @param vitoria true para carregar a tela de vitória, false para tela de
+     *                derrota.
      */
-    private static void carregarTelaFinal(Stage stage, boolean vitoria) {
+    private static void carregarTelaFinal(Stage stage, boolean vitoria) throws RecursoException {
         try {
             String fxmlPath = vitoria ? "/vitoria/vitoria-view.fxml" : "/perdeu/perdeu-view.fxml";
             FXMLLoader loader = new FXMLLoader(FinalizarFase.class.getResource(fxmlPath));
@@ -57,7 +67,7 @@ public class FinalizarFase {
             stage.setScene(new Scene(root));
             stage.show();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RecursoException("Erro ao carregar tela final: " + e.getMessage(), e);
         }
     }
 }

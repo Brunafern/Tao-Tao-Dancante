@@ -1,15 +1,21 @@
 package jogo.excecoes;
 
-//Nâo Refatorada
+/**
+ * Exceção genérica para erros de lógica ou fluxo do jogo que não se encaixam
+ * em outras exceções específicas (ex: arquivo, recurso, persistência).
+ * Pode armazenar a fase e o tipo do erro para facilitar o diagnóstico.
+ */
 
-public class ErroJogoException extends Exception {
+
+public class FluxoException extends Exception {
 
     private final String faseAtual;
     private final String tipoErro;
 
 
-    public ErroJogoException(String mensagem) {
-        super("Erro no jogo: " + mensagem);
+
+    public FluxoException(String mensagem) {
+        super("Erro de fluxo: " + mensagem);
         this.faseAtual = null;
         this.tipoErro = null;
     }
@@ -17,8 +23,9 @@ public class ErroJogoException extends Exception {
     /**
      * Construtor para ErroJogoException com informações contextuais.
      */
-    public ErroJogoException(String mensagem, String faseAtual, String tipoErro) {
-        super("Erro no jogo: " + mensagem);
+
+    public FluxoException(String mensagem, String faseAtual, String tipoErro) {
+        super("Erro de fluxo: " + mensagem);
         this.faseAtual = faseAtual;
         this.tipoErro = tipoErro;
     }
@@ -26,8 +33,9 @@ public class ErroJogoException extends Exception {
     /**
      * Construtor para ErroJogoException que encapsula uma exceção subjacente (causa).
      */
-    public ErroJogoException(String mensagem, Throwable causa) {
-        super("Erro no jogo: " + mensagem, causa);
+
+    public FluxoException(String mensagem, Throwable causa) {
+        super("Erro de fluxo: " + mensagem, causa);
         this.faseAtual = null;
         this.tipoErro = null;
     }
