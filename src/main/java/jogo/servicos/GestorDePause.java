@@ -18,8 +18,9 @@ import javafx.event.ActionEvent;
 import java.io.IOException;
 import java.util.List;
 import jogo.componentes.Setas;
+import jogo.interfaces.Pause;
 
-public class GestorDePause {
+public class GestorDePause  implements Pause{
 
     private static GestorDePause instancia;
 
