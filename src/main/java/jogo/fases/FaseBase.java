@@ -13,11 +13,15 @@ import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 import javafx.stage.Stage;
 import jogo.componentes.PlacarDeVida;
+import jogo.excecoes.FluxoException;
+import jogo.excecoes.RecursoException;
+import jogo.interfaces.FinalizarFaseInterface;
 import jogo.personagens.Bardo;
 import jogo.personagens.Lorde;
 import jogo.servicos.GerenciadorSetas;
-import jogo.servicos.GestorDePause;
 import jogo.servicos.FinalizarFase;
+import jogo.interfaces.PauseInterface;
+import jogo.servicos.GestorDePause;
 
 public abstract class FaseBase {
 
@@ -45,7 +49,7 @@ public abstract class FaseBase {
     protected Lorde lorde;
     protected Bardo bardo;
     protected GerenciadorSetas gerenciadorSetas;
-    protected GestorDePause gestorDePause;
+    protected PauseInterface pause; // Interface Pause
 
     protected boolean jogoFinalizado = false;
     protected double pontuacao = 0.5;
@@ -56,23 +60,20 @@ public abstract class FaseBase {
     private ImageView imagemErro;
     private ImageView imagemMiss;
 
-    /**
-     * Método chamado automaticamente pelo FXML após a criação da cena.
-     */
     @FXML
     protected void initialize() {
-    try {
-        inicializarComponentesDaFase();
-    } catch (jogo.excecoes.FluxoException e) {
-        System.err.println("Erro ao inicializar componentes da fase: " + e.getMessage());
-        e.printStackTrace();
+        try {
+            inicializarComponentesDaFase();
+        } catch (FluxoException e) {
+            e.printStackTrace();
+        }
+        // Após inicializar componentes, configuramos o pause e o teclado
+        configurarPauseECaptureTeclado();
+        iniciarFase();
     }
-    configurarTeclado();
-    iniciarFase();
-}
 
-    protected void inicializarComponentesDaFase() throws jogo.excecoes.FluxoException{
-      try {
+    protected void inicializarComponentesDaFase() throws FluxoException {
+        try {
             inicializarBackground();
             inicializarPersonagens();
             inicializarZonaAcerto();
@@ -80,19 +81,16 @@ public abstract class FaseBase {
             inicializarMusica();
             inicializarGerenciadorSetas();
         } catch (Exception e) {
-            throw new jogo.excecoes.FluxoException("Erro ao inicializar componentes da fase", e);
+            throw new FluxoException("Erro ao inicializar componentes da fase", e);
         }
     }
 
-    // Métodos abstratos obrigatórios para implementação específica de cada fase
+    // Métodos abstratos obrigatórios para cada fase
     protected abstract void inicializarBackground();
     protected abstract void inicializarPersonagens();
     protected abstract void inicializarMusica();
     protected abstract void iniciarFase();
 
-    /**
-     * @param caminhoRelativo Caminho relativo para o arquivo de imagem.
-     */
     protected void definirBackground(String caminhoRelativo) {
         Image imagem = new Image(getClass().getResourceAsStream(caminhoRelativo));
         background.setImage(imagem);
@@ -117,34 +115,33 @@ public abstract class FaseBase {
         gerenciadorSetas = new GerenciadorSetas(telaFase, zonaAcerto, reprodutorMidia, this::verificarResultadoFinal);
         gerenciadorSetas.setAcaoErro(this::exibirImagemErro);
         gerenciadorSetas.setAcaoMiss(this::exibirImagemMiss);
-
-    gestorDePause = new GestorDePause(
-        telaFase,
-        bardo.getAnimacao(),
-        reprodutorMidia,
-        gerenciadorSetas.getSetasAtivas(),
-        gerenciadorSetas::gerarSeta,
-        gerenciadorSetas
-    );
     }
 
-    protected void configurarTeclado() {
+    // Configuração do Pause e listener do teclado usando apenas a interface
+    protected void configurarPauseECaptureTeclado() {
+        if (pause == null) {
+            pause = GestorDePause.getInstance(
+                    telaFase,
+                    bardo.getAnimacao(),
+                    reprodutorMidia,
+                    gerenciadorSetas.getSetasAtivas(),
+                    gerenciadorSetas::gerarSeta,
+                    gerenciadorSetas
+            );
+        }
+
         telaFase.setFocusTraversable(true);
-        Platform.runLater(telaFase::requestFocus);
+        Platform.runLater(() -> telaFase.requestFocus());
 
         telaFase.setOnKeyPressed(evento -> {
             if (jogoFinalizado) return;
 
             if (evento.getCode() == KeyCode.ESCAPE) {
-                if (gestorDePause.estaPausado()) {
-                    gestorDePause.voltar();
-                } else {
-                    try {
-                        gestorDePause.pause();
-                    } catch (jogo.excecoes.RecursoException e) {
-                        System.err.println("Erro ao pausar o jogo: " + e.getMessage());
-                        e.printStackTrace();
-                    }
+                try {
+                    if (pause.estaPausado()) pause.voltar();
+                    else pause.pause();
+                } catch (RecursoException e) {
+                    e.printStackTrace();
                 }
             } else {
                 gerenciadorSetas.processarTecla(evento.getCode());
@@ -161,9 +158,7 @@ public abstract class FaseBase {
 
         placarDeVida.atualizar(pontuacao, lorde);
 
-        if (pontuacao <= 0) {
-            finalizarFase(false);
-        }
+        if (pontuacao <= 0) finalizarFase(false);
     }
 
     protected void verificarResultadoFinal() {
@@ -171,9 +166,6 @@ public abstract class FaseBase {
         finalizarFase(venceu);
     }
 
-    /**
-     * @param vitoria true se o jogador venceu, false se perdeu
-     */
     protected void finalizarFase(boolean vitoria) {
         if (jogoFinalizado) return;
         jogoFinalizado = true;
@@ -182,21 +174,19 @@ public abstract class FaseBase {
         if (reprodutorMidia != null) reprodutorMidia.stop();
         gerenciadorSetas.pararSetas();
 
+        FinalizarFaseInterface finalizarFase = new FinalizarFase();
+
         Stage palco = (Stage) telaFase.getScene().getWindow();
         if (palco != null) {
             try {
-                FinalizarFase.finalizarFase(palco, vitoria);
-            } catch (jogo.excecoes.RecursoException e) {
-                System.err.println("Erro ao finalizar fase: " + e.getMessage());
-                e.printStackTrace();
-            } catch (jogo.excecoes.FluxoException e) {
-                System.err.println("Erro inesperado ao finalizar fase: " + e.getMessage());
+                finalizarFase.finalizarFase(palco, vitoria);
+            } catch (FluxoException | RecursoException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    // Feedback visual de erro ou miss
+    // Feedback visual
     protected void exibirImagemErro() { exibirImagemFeedback("/assets/erro/erro.png", true); }
     protected void exibirImagemMiss() { exibirImagemFeedback("/assets/erro/miss.png", false); }
 
@@ -211,9 +201,7 @@ public abstract class FaseBase {
 
             if (isErro) imagemErro = imagem;
             else imagemMiss = imagem;
-
         } catch (Exception e) {
-            System.err.println("Erro ao carregar a imagem de feedback: " + e.getMessage());
             e.printStackTrace();
         }
     }

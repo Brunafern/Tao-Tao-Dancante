@@ -8,6 +8,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import jogo.interfaces.GerenciadorPersistenciaVolumeInterface;
 import jogo.servicos.GerenciadorPersistenciaVolume;
 import jogo.excecoes.PersistenciaDadosException;
 import jogo.excecoes.ArquivoException;
@@ -31,7 +32,7 @@ public class ControleVolume extends StackPane {
     private MediaPlayer reprodutorMidia;
     private double volumeAtual;
 
-    private final GerenciadorPersistenciaVolume gerenciadorPersistencia;
+    private final GerenciadorPersistenciaVolumeInterface gerenciadorPersistencia;
 
     public ControleVolume() {
         this.gerenciadorPersistencia = new GerenciadorPersistenciaVolume();

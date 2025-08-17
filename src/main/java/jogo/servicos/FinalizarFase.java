@@ -1,5 +1,6 @@
 package jogo.servicos;
 
+import javafx.fxml.Initializable;
 import jogo.excecoes.RecursoException;
 import jogo.excecoes.FluxoException;
 import javafx.animation.FadeTransition;
@@ -10,14 +11,15 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import jogo.interfaces.FinalizarFaseInterface;
 
-public class FinalizarFase {
+public class FinalizarFase implements FinalizarFaseInterface {
 
     /**
      * @param stage   palco principal da aplicação (onde a cena será carregada).
      * @param vitoria true se o jogador venceu a fase, false caso tenha perdido.
      */
-    public static void finalizarFase(Stage stage, boolean vitoria) throws RecursoException, FluxoException {
+    public void finalizarFase(Stage stage, boolean vitoria) throws RecursoException, FluxoException {
         try {
             tocarSom(vitoria);
             carregarTelaFinal(stage, vitoria);

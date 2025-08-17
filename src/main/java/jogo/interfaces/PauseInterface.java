@@ -2,7 +2,7 @@ package jogo.interfaces;
 
 import javafx.event.ActionEvent;
 
-public interface Pause {
+public interface PauseInterface {
     void pause() throws jogo.excecoes.RecursoException;
     void voltar();
     boolean estaPausado();

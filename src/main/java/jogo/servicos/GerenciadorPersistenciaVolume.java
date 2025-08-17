@@ -1,13 +1,15 @@
 package jogo.servicos;
 
 import jogo.excecoes.PersistenciaDadosException;
+import jogo.interfaces.GerenciadorPersistenciaVolumeInterface;
+
 import java.util.prefs.Preferences;
 
 /**
  * Utiliza a API {@link Preferences} para salvar, carregar, resetar ou limpar valores,
  * garantindo que a configuração seja mantida entre execuções.
  */
-public class GerenciadorPersistenciaVolume {
+public class GerenciadorPersistenciaVolume implements GerenciadorPersistenciaVolumeInterface {
 
     private static final String CHAVE_VOLUME = "volume_jogo";
 

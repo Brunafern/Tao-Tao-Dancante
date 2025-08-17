@@ -18,6 +18,7 @@ public class MainApplication extends Application {
      * @param stage stage principal fornecido pelo JavaFX
      * @throws IOException caso ocorra erro ao carregar o FXML do menu principal
      */
+
     @Override
     public void start(Stage stage) {
         mainStage = stage;
