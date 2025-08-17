@@ -1,7 +1,5 @@
 package jogo.servicos;
 
-//Não Refatorado
-
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,11 +11,18 @@ import javafx.util.Duration;
 
 public class FinalizarFase {
 
+    /**
+     * @param stage  palco principal da aplicação (onde a cena será carregada).
+     * @param vitoria true se o jogador venceu a fase, false caso tenha perdido.
+     */
     public static void finalizarFase(Stage stage, boolean vitoria) {
         tocarSom(vitoria);
         carregarTelaFinal(stage, vitoria);
     }
 
+    /**
+     * @param vitoria true para tocar música de vitória, false para música de derrota.
+     */
     private static void tocarSom(boolean vitoria) {
         String soundFile = vitoria ? "victory-.mp3" : "losetrumpet.mp3";
         try {
@@ -33,6 +38,10 @@ public class FinalizarFase {
         }
     }
 
+    /**
+     * @param stage   palco principal da aplicação.
+     * @param vitoria true para carregar a tela de vitória, false para tela de derrota.
+     */
     private static void carregarTelaFinal(Stage stage, boolean vitoria) {
         try {
             String fxmlPath = vitoria ? "/vitoria/vitoria-view.fxml" : "/perdeu/perdeu-view.fxml";
@@ -52,4 +61,3 @@ public class FinalizarFase {
         }
     }
 }
-

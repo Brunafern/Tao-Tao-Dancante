@@ -1,7 +1,5 @@
 package jogo.servicos;
 
-//Não Refatorado
-
 import javafx.animation.Animation;
 import javafx.animation.ParallelTransition;
 import javafx.animation.Timeline;
@@ -20,6 +18,7 @@ import java.util.List;
 import jogo.componentes.Setas;
 import jogo.interfaces.Pause;
 
+
 public class GestorDePause implements Pause {
 
     private static GestorDePause instancia;
@@ -35,6 +34,14 @@ public class GestorDePause implements Pause {
     private final Runnable acaoRetornarJogo;
     private final GerenciadorSetas gerenciadorSetas;
 
+    /**
+     * @param painelPrincipal painel principal do jogo
+     * @param animacoes animações em execução
+     * @param reprodutorMidia reprodutor de música
+     * @param setasAtivas lista de setas ativas
+     * @param acaoRetornarJogo ação a ser executada ao retornar ao jogo
+     * @param gerenciadorSetas gerenciador de setas
+     */
     private GestorDePause(Pane painelPrincipal, Timeline animacoes, MediaPlayer reprodutorMidia,
                           List<Setas> setasAtivas, Runnable acaoRetornarJogo,
                           GerenciadorSetas gerenciadorSetas) {
@@ -45,6 +52,15 @@ public class GestorDePause implements Pause {
         this.gerenciadorSetas = gerenciadorSetas;
     }
 
+    /**
+     * @param painelPrincipal painel principal do jogo
+     * @param animacoes animações em execução
+     * @param reprodutorMidia reprodutor de música
+     * @param setasAtivas lista de setas ativas
+     * @param acaoRetornarJogo ação ao retornar ao jogo
+     * @param gerenciadorSetas gerenciador de setas
+     * @return instância única de {@link GestorDePause}
+     */
     public static GestorDePause getInstance(Pane painelPrincipal, Timeline animacoes, MediaPlayer reprodutorMidia,
                                             List<Setas> setasAtivas, Runnable acaoRetornarJogo,
                                             GerenciadorSetas gerenciadorSetas) {
@@ -54,6 +70,10 @@ public class GestorDePause implements Pause {
         return instancia;
     }
 
+    /**
+     * Pausa o jogo, incluindo animações, áudio e spawn de setas,
+     * além de exibir a tela de pausa.
+     */
     @Override
     public void pause() {
         if (!jogoPausado) {
@@ -76,7 +96,7 @@ public class GestorDePause implements Pause {
 
     private void pausarGerenciadorSetas() {
         if (gerenciadorSetas != null) {
-            gerenciadorSetas.pauseSpawn();
+            gerenciadorSetas.pausaSpawn();
             gerenciadorSetas.setJogoPausado(true);
         }
     }
@@ -132,7 +152,7 @@ public class GestorDePause implements Pause {
 
     private void retomarGerenciadorSetas() {
         if (gerenciadorSetas != null) {
-            gerenciadorSetas.resumeSpawn();
+            gerenciadorSetas.retomaSpawn();
             gerenciadorSetas.setJogoPausado(false);
         }
     }
@@ -154,11 +174,17 @@ public class GestorDePause implements Pause {
         }
     }
 
+    /**
+     * @return {true} se o jogo estiver pausado, {false} caso contrário.
+     */
     @Override
     public boolean estaPausado() {
         return jogoPausado;
     }
 
+    /**
+     * @param evento evento disparado pelo botão de voltar
+     */
     @Override
     public void voltarParaMenu(ActionEvent evento) {
         try {
