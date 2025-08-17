@@ -1,7 +1,5 @@
 package jogo.servicos;
 
-//Não Refatorado
-
 import javafx.animation.Animation;
 import javafx.animation.ParallelTransition;
 import javafx.animation.PauseTransition;
@@ -14,23 +12,22 @@ import javafx.util.Duration;
 import jogo.componentes.PlacarDeVida;
 import jogo.componentes.Setas;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.lang.Runnable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class GerenciadorSetas {
 
-    // Constantes para as dimensões e posições das setas
+    // Constantes de dimensões e posições
     private static final double START_X = 300.0;
     private static final double ESPACAMENTO = 165.0;
     private static final double LARGURA_SETA = 190.0;
     private static final double ALTURA_SETA = 180.0;
-    private static final double POSICAO_Y_INICIAL_SETA = 900.0;
-    private static final double DISTANCIA_SUBIDA = POSICAO_Y_INICIAL_SETA + ALTURA_SETA;
+    private static final double POSICAO_Y_INICIAL = 900.0;
+    private static final double DISTANCIA_SUBIDA = POSICAO_Y_INICIAL + ALTURA_SETA;
     private static final Duration DURACAO_ESCONDER_SETA_APOS_BRILHO = Duration.seconds(0.15);
 
     private final AnchorPane painelPrincipal;
@@ -38,26 +35,35 @@ public class GerenciadorSetas {
     private final MediaPlayer audio;
     private final PlacarDeVida placar;
     private final Runnable acaoFimDeFase;
+
     private final List<Setas> setasAtivas = new ArrayList<>();
-    private final Random random = new Random();
     private Timeline timelineSpawn;
     private Runnable acaoErro;
     private Runnable acaoMiss;
+
     private boolean jogoTerminou = false;
     private boolean jogoPausado = false;
 
-    // ✨ NOVO: Sequência de setas única da fase (vem do JSON)
     private int[] sequenciaSetasFase;
     private int indiceSequencia = 0;
 
-    // ✨ NOVO: Configurações de tempo vindas do JSON
     private LeitorJSONSimples.ConfiguracoesTempo configuracoesTempo;
 
     private Supplier<Double> fornecedorDuracaoAnimacao;
     private Consumer<Boolean> atualizadorPontuacao;
     private Runnable acaoAoIniciarSetas;
 
-    public GerenciadorSetas(AnchorPane painelPrincipal, Rectangle zonaAcerto, MediaPlayer audio, PlacarDeVida placar, Runnable acaoFimDeFase) {
+    private final Random random = new Random();
+
+    /**
+     * @param painelPrincipal painel principal do jogo onde as setas serão exibidas
+     * @param zonaAcerto área da tela onde o jogador deve acertar as setas
+     * @param audio player da música da fase
+     * @param placar placar de vida do jogador
+     * @param acaoFimDeFase ação a executar ao terminar a fase
+     */
+    public GerenciadorSetas(AnchorPane painelPrincipal, Rectangle zonaAcerto,
+                            MediaPlayer audio, PlacarDeVida placar, Runnable acaoFimDeFase) {
         this.painelPrincipal = painelPrincipal;
         this.zonaAcerto = zonaAcerto;
         this.audio = audio;
@@ -69,99 +75,60 @@ public class GerenciadorSetas {
         this.jogoPausado = jogoPausado;
     }
 
-    public void setJogoTerminou(boolean jogoTerminou) {
-        this.jogoTerminou = jogoTerminou;
-    }
+    public void setJogoTerminou(boolean jogoTerminou) { this.jogoTerminou = jogoTerminou; }
 
-    // ✨ NOVO: Define a sequência de setas única da fase
-    public void setSequenciaSetasFase(int[] sequencia) {
-        this.sequenciaSetasFase = sequencia;
-        this.indiceSequencia = 0; // Reseta o índice quando muda a sequência
-    }
-
-    // ✨ NOVO: Carrega dados diretamente do JSON para uma fase
+    /**
+     * @param numeroFase número da fase a carregar
+     */
     public void carregarDadosDaFase(int numeroFase) {
-        System.out.println("📖 Carregando dados da fase " + numeroFase + " diretamente do JSON...");
-
         this.sequenciaSetasFase = LeitorJSONSimples.carregarSequenciaSetas(numeroFase);
         this.configuracoesTempo = LeitorJSONSimples.carregarConfiguracoesTempo(numeroFase);
         this.indiceSequencia = 0;
-
-        System.out.println("✅ Fase " + numeroFase + " carregada: " + sequenciaSetasFase.length + " setas");
     }
 
-    public void setFornecedorDuracaoAnimacao(Supplier<Double> fornecedor) {
-        this.fornecedorDuracaoAnimacao = fornecedor;
-    }
+    public void setFornecedorDuracaoAnimacao(Supplier<Double> fornecedor) { this.fornecedorDuracaoAnimacao = fornecedor; }
 
-    public void setAtualizadorPontuacao(Consumer<Boolean> atualizador) {
-        this.atualizadorPontuacao = atualizador;
-    }
+    public void setAtualizadorPontuacao(Consumer<Boolean> atualizador) { this.atualizadorPontuacao = atualizador; }
 
-    public void setAcaoAoIniciarSetas(Runnable acao) {
-        this.acaoAoIniciarSetas = acao;
-    }
+    public void setAcaoAoIniciarSetas(Runnable acao) { this.acaoAoIniciarSetas = acao; }
 
-    public void setAcaoErro(Runnable acaoErro) {
-        this.acaoErro = acaoErro;
-    }
+    public void setAcaoErro(Runnable acaoErro) { this.acaoErro = acaoErro; }
 
-    public void setAcaoMiss(Runnable acaoMiss) {
-        this.acaoMiss = acaoMiss;
-    }
+    public void setAcaoMiss(Runnable acaoMiss) { this.acaoMiss = acaoMiss; }
 
     public void iniciar() {
         audio.setOnReady(() -> {
             audio.play();
-            if (acaoAoIniciarSetas != null) {
-                acaoAoIniciarSetas.run();
-            }
+            if (acaoAoIniciarSetas != null) acaoAoIniciarSetas.run();
         });
-
         audio.setOnEndOfMedia(acaoFimDeFase);
     }
 
-
     public void pararSetas() {
-        if (timelineSpawn != null) {
-            timelineSpawn.stop();
-        }
-
+        if (timelineSpawn != null) timelineSpawn.stop();
         for (Setas seta : new ArrayList<>(setasAtivas)) {
-            ParallelTransition animacaoSubida = seta.getAnimacaoSubida();
-            if (animacaoSubida != null && animacaoSubida.getStatus() == Animation.Status.RUNNING) {
-                animacaoSubida.stop();
-            }
+            ParallelTransition animacao = seta.getAnimacaoSubida();
+            if (animacao != null && animacao.getStatus() == Animation.Status.RUNNING) animacao.stop();
             painelPrincipal.getChildren().remove(seta);
         }
         setasAtivas.clear();
     }
 
     public void gerarSeta() {
-        if (jogoTerminou || jogoPausado) {
-            return;
-        }
-
-        if (sequenciaSetasFase == null || indiceSequencia >= sequenciaSetasFase.length) {
-            System.out.println("🎵 Sequência de setas da fase concluída ou não definida!");
-            return;
-        }
+        if (jogoTerminou || jogoPausado) return;
+        if (sequenciaSetasFase == null || indiceSequencia >= sequenciaSetasFase.length) return;
 
         Setas.TipoSetas tipo = Setas.TipoSetas.values()[sequenciaSetasFase[indiceSequencia++]];
         Setas novaSeta = new Setas(tipo, LARGURA_SETA, ALTURA_SETA, this::lidarComSetaPerdida);
 
-        double posX = calcularPosicaoX(tipo);
-
-        novaSeta.setLayoutX(posX);
-        novaSeta.setLayoutY(POSICAO_Y_INICIAL_SETA);
+        novaSeta.setLayoutX(calcularPosicaoX(tipo));
+        novaSeta.setLayoutY(POSICAO_Y_INICIAL);
         painelPrincipal.getChildren().add(novaSeta);
         setasAtivas.add(novaSeta);
 
-        double duracaoAnimacao = fornecedorDuracaoAnimacao != null ? fornecedorDuracaoAnimacao.get() : 3000;
-        novaSeta.iniciarAnimacaoSubida(duracaoAnimacao, DISTANCIA_SUBIDA).setOnFinished(event -> {
-            if (novaSeta.isVisible()) {
-                novaSeta.lidarComErro(painelPrincipal, setasAtivas);
-            }
+        double duracao = fornecedorDuracaoAnimacao != null ? fornecedorDuracaoAnimacao.get() : 3000;
+        novaSeta.iniciarAnimacaoSubida(duracao, DISTANCIA_SUBIDA).setOnFinished(event -> {
+            if (novaSeta.isVisible()) novaSeta.lidarComErro(painelPrincipal, setasAtivas);
         });
     }
 
@@ -174,20 +141,17 @@ public class GerenciadorSetas {
         };
     }
 
+    /**
+     * @param tecla tecla pressionada
+     */
     public void processarTecla(KeyCode tecla) {
-        if (this.jogoTerminou) {
-            return;
-        }
+        if (jogoTerminou) return;
 
         Setas.TipoSetas tipoTecla = obterTipoSetaPorTecla(tecla);
-        if (tipoTecla == null) {
-            return;
-        }
+        if (tipoTecla == null) return;
 
         boolean acertou = tentarAcertarSeta(tipoTecla);
-        if (!acertou) {
-            lidarComErroDeAcerto(tipoTecla);
-        }
+        if (!acertou) lidarComErroDeAcerto(tipoTecla);
     }
 
     private Setas.TipoSetas obterTipoSetaPorTecla(KeyCode tecla) {
@@ -204,11 +168,9 @@ public class GerenciadorSetas {
         Iterator<Setas> iterator = setasAtivas.iterator();
         while (iterator.hasNext()) {
             Setas seta = iterator.next();
-            if (seta.getTipo() == tipo && seta.isVisible()) {
-                if (estaNaZonaDeAcerto(seta)) {
-                    processarAcerto(seta, iterator);
-                    return true;
-                }
+            if (seta.getTipo() == tipo && estaNaZonaDeAcerto(seta)) {
+                processarAcerto(seta, iterator);
+                return true;
             }
         }
         return false;
@@ -222,13 +184,9 @@ public class GerenciadorSetas {
     }
 
     private void processarAcerto(Setas seta, Iterator<Setas> iterator) {
-        System.out.println("Acerto: " + seta.getTipo());
-        if (atualizadorPontuacao != null) {
-            atualizadorPontuacao.accept(true);
-        }
+        if (atualizadorPontuacao != null) atualizadorPontuacao.accept(true);
 
         seta.aplicarEfeitoBrilho();
-
         PauseTransition delay = new PauseTransition(DURACAO_ESCONDER_SETA_APOS_BRILHO);
         delay.setOnFinished(event -> {
             seta.esconder();
@@ -240,37 +198,18 @@ public class GerenciadorSetas {
     }
 
     private void lidarComErroDeAcerto(Setas.TipoSetas tipo) {
-        System.out.println("Erro: nenhuma " + tipo + " válida na zona de acerto.");
-        if (atualizadorPontuacao != null) {
-            atualizadorPontuacao.accept(false);
-        }
-        if (acaoErro != null) {
-            acaoErro.run();
-        }
-    }
-
-    public List<Setas> getSetasAtivas() {
-        return setasAtivas;
-    }
-
-    public void pauseSpawn() {
-        if (timelineSpawn != null) {
-            timelineSpawn.pause();
-        }
-    }
-
-    public void resumeSpawn() {
-        if (timelineSpawn != null) {
-            timelineSpawn.play();
-        }
+        if (atualizadorPontuacao != null) atualizadorPontuacao.accept(false);
+        if (acaoErro != null) acaoErro.run();
     }
 
     private void lidarComSetaPerdida() {
-        if (acaoMiss != null) {
-            acaoMiss.run();
-        }
-        if (atualizadorPontuacao != null) {
-            atualizadorPontuacao.accept(false);
-        }
+        if (acaoMiss != null) acaoMiss.run();
+        if (atualizadorPontuacao != null) atualizadorPontuacao.accept(false);
     }
+
+    public List<Setas> getSetasAtivas() { return setasAtivas; }
+
+    public void pausaSpawn() { if (timelineSpawn != null) timelineSpawn.pause(); }
+
+    public void retomaSpawn() { if (timelineSpawn != null) timelineSpawn.play(); }
 }

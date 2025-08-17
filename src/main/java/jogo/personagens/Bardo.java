@@ -1,14 +1,11 @@
 package jogo.personagens;
 
-//Não refatorado
-
 import jogo.modelo.enume.TipoPersonagem;
 import jogo.excecoes.PersonagemInvalidoException;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
-
 
 public class Bardo extends PersonagemJogo {
 
@@ -19,32 +16,36 @@ public class Bardo extends PersonagemJogo {
     private int bonusRitmo;
     private boolean inspiracaoAtiva;
 
-    // Animações
+    // Imagens para animação
     private final Image imagemPadrao;
     private final Image imagemAlternativa;
+
+    // Animação de troca de frames
     private final Timeline animacao;
 
-
+    /**
+     * @param largura largura do personagem em pixels
+     * @param altura  altura do personagem em pixels
+     * @throws PersonagemInvalidoException se algum parâmetro for inválido
+     */
     public Bardo(double largura, double altura) throws PersonagemInvalidoException {
         super("Bardo", TipoPersonagem.BARDO, largura, altura);
 
         this.bonusRitmo = 10;
         this.inspiracaoAtiva = false;
 
-        // Carregamento de imagens
         this.imagemPadrao = new Image(getClass().getResource("/assets/persona/bardoDance1.png").toExternalForm());
         this.imagemAlternativa = new Image(getClass().getResource("/assets/persona/bardoDance2.png").toExternalForm());
 
         this.setImage(imagemPadrao);
 
-        // Configuração da animação
+        // Configura animação contínua alternando frames
         this.animacao = new Timeline(
                 new KeyFrame(Duration.millis(DURACAO_KEYFRAME_MILLIS), e -> alternarFrame())
         );
         this.animacao.setCycleCount(Timeline.INDEFINITE);
         this.animacao.play();
     }
-
 
     private void alternarFrame() {
         if (this.getImage() == imagemPadrao) {
@@ -55,41 +56,10 @@ public class Bardo extends PersonagemJogo {
     }
 
     /**
-     * Retorna a linha do tempo da animação.
+     * @return Timeline da animação contínua
      */
     public Timeline getAnimacao() {
         return animacao;
     }
 
-    @Override
-    public void executarMovimento() {
-        System.out.println(getNome() + " executa um movimento musical ritmado!");
-
-        int pontosBase = getTipo().getBonusPontuacao();
-        int pontosComBonus = pontosBase + bonusRitmo;
-
-        if (inspiracaoAtiva) {
-            pontosComBonus *= 2;
-            inspiracaoAtiva = false;
-        }
-
-        adicionarPontos(pontosComBonus);
-    }
-
-    @Override
-    public void usarHabilidadeEspecial() {
-        System.out.println(getNome() + " usa Inspiração Bardica!");
-        this.inspiracaoAtiva = true;
-        this.bonusRitmo += 5;
-        setMultiplicadorPontos(getMultiplicadorPontos() + 0.2);
-
-        animacao.setRate(TAXA_ANIMACAO_HABILIDADE);
-    }
-
-    @Override
-    public String obterDescricao() {
-        return "Bardo " + getNome() + " - Especialista em ritmo e música. " +
-                "Bônus de ritmo: " + bonusRitmo +
-                (inspiracaoAtiva ? " (Inspiração Ativa!)" : "");
-    }
 }
