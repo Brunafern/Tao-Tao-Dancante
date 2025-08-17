@@ -7,7 +7,7 @@ import javafx.animation.Timeline;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
 
-public class Bardo extends PersonagemJogo {
+public class Bardo extends Personagem {
 
     private static final double DURACAO_KEYFRAME_MILLIS = 400.0;
 

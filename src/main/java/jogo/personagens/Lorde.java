@@ -6,7 +6,7 @@ import jogo.excecoes.PersonagemInvalidoException;
 
 import java.util.Objects;
 
-public class Lorde extends PersonagemJogo {
+public class Lorde extends Personagem{
 
     private final Image imgPensador;
     private final Image imgRaiva;
