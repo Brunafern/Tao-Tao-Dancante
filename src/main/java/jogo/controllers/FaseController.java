@@ -4,7 +4,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import jogo.fases.FaseGenerica;
+import jogo.fases.Fase1;
+import jogo.excecoes.RecursoException;
 
 public class FaseController {
 
@@ -19,7 +20,8 @@ public class FaseController {
     public void carregarFase(Stage stage, int numeroFase) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(CAMINHO_VIEW_FASES));
-            loader.setController(new FaseGenerica(numeroFase));
+            loader.setController(new Fase1());
+             
 
             Parent root = loader.load();
             Scene scene = new Scene(root);
@@ -29,8 +31,9 @@ public class FaseController {
             stage.show();
 
         } catch (Exception e) {
-            System.err.println("Erro ao carregar fase " + numeroFase + ": " + e.getMessage());
-            e.printStackTrace();
+            RecursoException excecao = new RecursoException("Erro ao carregar fase " + numeroFase + ": " + e.getMessage(), e);
+            System.err.println(excecao.getMessage());
+            excecao.printStackTrace();
         }
     }
 
@@ -44,7 +47,7 @@ public class FaseController {
         if (proximaFase <= NUMERO_MAXIMO_FASES) {
             carregarFase(stage, proximaFase);
         } else {
-            System.out.println("🏆 Todas as fases foram completadas!");
+            System.out.println("Todas as fases foram completadas!");
         }
     }
 

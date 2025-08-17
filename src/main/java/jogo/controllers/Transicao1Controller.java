@@ -8,7 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.Node;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import jogo.excecoes.RecursoException;
 
 public class Transicao1Controller {
 
@@ -29,9 +29,11 @@ public class Transicao1Controller {
 
             palco.setScene(cena);
             palco.show();
-        } catch (IOException erro) {
-            System.err.println("❌ Erro ao carregar a tela do menu principal: " + erro.getMessage());
-            erro.printStackTrace();
+        } catch (Exception erro) {
+            RecursoException excecao = new RecursoException("Erro ao carregar a tela do menu principal: " + erro.getMessage(), erro);
+            System.err.println(excecao.getMessage());
+            excecao.printStackTrace();
+            // Aqui você pode exibir um alerta para o usuário, se desejar
         }
     }
 
@@ -45,8 +47,9 @@ public class Transicao1Controller {
             FaseController faseController = new FaseController();
             faseController.carregarFase(palco, NUMERO_FASE_INICIAL);
         } catch (Exception erro) {
-            System.err.println("❌ Erro ao carregar a fase " + NUMERO_FASE_INICIAL + ": " + erro.getMessage());
-            erro.printStackTrace();
+            RecursoException excecao = new RecursoException("Erro ao carregar a fase " + NUMERO_FASE_INICIAL + ": " + erro.getMessage(), erro);
+            System.err.println(excecao.getMessage());
+            excecao.printStackTrace();
         }
     }
 }

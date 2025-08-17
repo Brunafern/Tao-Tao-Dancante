@@ -1,5 +1,6 @@
 package jogo.servicos;
 
+import jogo.excecoes.PersistenciaDadosException;
 import java.util.prefs.Preferences;
 
 /**
@@ -21,12 +22,12 @@ public class GerenciadorPersistenciaVolume {
     /**
      * @param volume valor do volume entre 0.0 (mudo) e 1.0 (100%).
      */
-    public void salvarVolume(double volume) {
+    public void salvarVolume(double volume) throws PersistenciaDadosException {
         try {
             prefs.putDouble(CHAVE_VOLUME, volume);
             prefs.flush(); // garante persistência imediata
         } catch (Exception e) {
-            System.err.println("❌ Erro ao salvar volume no SO: " + e.getMessage());
+            throw new PersistenciaDadosException("Erro ao salvar volume no SO: " + e.getMessage(), e);
         }
     }
 

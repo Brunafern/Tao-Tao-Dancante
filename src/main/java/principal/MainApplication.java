@@ -8,7 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import java.io.IOException;
+import jogo.excecoes.RecursoException;
 
 public class MainApplication extends Application {
 
@@ -19,20 +19,26 @@ public class MainApplication extends Application {
      * @throws IOException caso ocorra erro ao carregar o FXML do menu principal
      */
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) {
         mainStage = stage;
+        try {
+            FXMLLoader menu = new FXMLLoader(getClass().getResource("/menu/menu-principal-view.fxml"));
+            Scene scene = new Scene(menu.load(), 1236, 804);
 
-        FXMLLoader menu = new FXMLLoader(getClass().getResource("/menu/menu-principal-view.fxml"));
-        Scene scene = new Scene(menu.load(), 1236, 804);
+            // Ícone da aplicação
+            Image icon = new Image(getClass().getResourceAsStream("/assets/icones/icone2.png"));
+            mainStage.getIcons().add(icon);
 
-        // Ícone da aplicação
-        Image icon = new Image(getClass().getResourceAsStream("/assets/icones/icone2.png"));
-        mainStage.getIcons().add(icon);
-
-        mainStage.setTitle("Tão Tão Dançante");
-        mainStage.setScene(scene);
-        mainStage.setResizable(false);
-        mainStage.show();
+            mainStage.setTitle("Tão Tão Dançante");
+            mainStage.setScene(scene);
+            mainStage.setResizable(false);
+            mainStage.show();
+        } catch (Exception e) {
+            RecursoException excecao = new RecursoException("Erro ao carregar recursos iniciais: " + e.getMessage(), e);
+            System.err.println(excecao.getMessage());
+            excecao.printStackTrace();
+            // Aqui pode-se exibir um alerta para o usuário, se desejar
+        }
     }
 
     /**
@@ -62,15 +68,19 @@ public class MainApplication extends Application {
                     fadeIn.setToValue(1.0);
                     fadeIn.play();
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    RecursoException excecao = new RecursoException("Erro ao trocar tela: " + e.getMessage(), e);
+                    System.err.println(excecao.getMessage());
+                    excecao.printStackTrace();
                 }
             });
 
             fadeOut.play();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            RecursoException excecao = new RecursoException("Erro ao iniciar troca de tela: " + e.getMessage(), e);
+            System.err.println(excecao.getMessage());
+            excecao.printStackTrace();
         }
     }
 
@@ -78,6 +88,15 @@ public class MainApplication extends Application {
      * @param args argumentos de linha de comando (não utilizados)
      */
     public static void main(String[] args) {
-        launch();
+        try {
+            launch(args);
+        } catch (Exception e) {
+            try {
+                throw new jogo.excecoes.FluxoException("Erro inesperado na aplicação principal", e);
+            } catch (jogo.excecoes.FluxoException ex) {
+                System.err.println("Erro inesperado na aplicação principal: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
     }
 }

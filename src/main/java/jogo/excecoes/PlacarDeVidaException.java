@@ -1,22 +1,21 @@
+
 package jogo.excecoes;
 
-//Nâo Refatorada
-
-public class VidaInsuficienteException extends RuntimeException {
+public class PlacarDeVidaException extends RuntimeException {
     
     private int vidasRestantes;
     private String acaoTentada;
     
-    public VidaInsuficienteException(String mensagem) {
+    public PlacarDeVidaException(String mensagem) {
         super("Vidas insuficientes: " + mensagem);
     }
     
-    public VidaInsuficienteException(String mensagem, int vidasRestantes) {
+    public PlacarDeVidaException(String mensagem, int vidasRestantes) {
         super("Vidas insuficientes: " + mensagem);
         this.vidasRestantes = vidasRestantes;
     }
     
-    public VidaInsuficienteException(String mensagem, int vidasRestantes, String acaoTentada) {
+    public PlacarDeVidaException(String mensagem, int vidasRestantes, String acaoTentada) {
         super("Vidas insuficientes: " + mensagem);
         this.vidasRestantes = vidasRestantes;
         this.acaoTentada = acaoTentada;

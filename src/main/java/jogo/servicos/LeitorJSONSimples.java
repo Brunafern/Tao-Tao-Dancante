@@ -1,5 +1,6 @@
 package jogo.servicos;
 
+import jogo.excecoes.ArquivoException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
@@ -7,14 +8,12 @@ import java.util.Scanner;
 public class LeitorJSONSimples {
 
     private static final String PASTA_JSON = "/dados-fase/";
-    private static final String MUSICA_PADRAO = "/assets/musica/song1.mp3";
-    private static final ConfiguracoesTempo TEMPO_PADRAO = new ConfiguracoesTempo(6000.0, 3000.0, 28000.0);
 
     /**
      * @param numeroFase número da fase
      * @return array de inteiros representando a sequência de setas; array vazio se não encontrado
      */
-    public static int[] carregarSequenciaSetas(int numeroFase) {
+    public static int[] carregarSequenciaSetas(int numeroFase) throws ArquivoException {
         String json = lerJSON(numeroFase);
         return json.isEmpty() ? new int[0] : extrairSequenciaSetas(json);
     }
@@ -23,37 +22,35 @@ public class LeitorJSONSimples {
      * @param numeroFase número da fase
      * @return caminho da música; retorna caminho padrão se não encontrado
      */
-    public static String carregarCaminhoMusica(int numeroFase) {
+    public static String carregarCaminhoMusica(int numeroFase) throws ArquivoException {
         String json = lerJSON(numeroFase);
-        return json.isEmpty() ? MUSICA_PADRAO : extrairString(json, "caminhoMusica");
+        return json.isEmpty() ? "" : extrairString(json, "caminhoMusica");
     }
 
     /**
      * @param numeroFase número da fase
      * @return objeto ConfiguracoesTempo com os valores da fase; retorna valores padrão se não encontrado
      */
-    public static ConfiguracoesTempo carregarConfiguracoesTempo(int numeroFase) {
+    public static ConfiguracoesTempo carregarConfiguracoesTempo(int numeroFase) throws ArquivoException {
         String json = lerJSON(numeroFase);
-        return json.isEmpty() ? TEMPO_PADRAO : extrairConfiguracoesTempo(json);
+        return json.isEmpty() ? null : extrairConfiguracoesTempo(json);
     }
 
     /**
      * @param numeroFase número da fase
-     * @return conteúdo do JSON como String; retorna vazio se não encontrado ou erro
+    * @return conteúdo do JSON como String; lança ArquivoException se não encontrado ou erro
      */
-    private static String lerJSON(int numeroFase) {
+    private static String lerJSON(int numeroFase) throws ArquivoException {
         String nomeArquivo = "fase" + numeroFase + ".json";
         try (InputStream inputStream = LeitorJSONSimples.class.getResourceAsStream(PASTA_JSON + nomeArquivo)) {
             if (inputStream == null) {
-                System.err.println("Arquivo não encontrado: " + nomeArquivo);
-                return "";
+                throw new ArquivoException("Arquivo não encontrado: " + nomeArquivo);
             }
             try (Scanner scanner = new Scanner(inputStream, StandardCharsets.UTF_8)) {
                 return scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
             }
         } catch (Exception e) {
-            System.err.println("Erro ao ler JSON da fase " + numeroFase + ": " + e.getMessage());
-            return "";
+            throw new ArquivoException("Erro ao ler JSON da fase " + numeroFase + ": " + e.getMessage(), e);
         }
     }
 

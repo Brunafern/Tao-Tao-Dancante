@@ -33,11 +33,11 @@ public class Setas extends ImageView {
 
     private static final double OPACIDADE_INICIAL_ANIMACAO = 0.0;
     private static final double OPACIDADE_FINAL_ANIMACAO = 1.0;
-    private static final double OPACIDADE_BRILHO_FINAL = 1.1;
+    private static final double OPACIDADE_BRILHO_FINAL = 1.0;
     private static final double DURACAO_FLASH_SEGUNDOS = 0.15;
     private static final String ESTILO_BRILHO = "-fx-effect: dropshadow(gaussian, gold, 5, 0.4, 0, 0);";
 
-    private TipoSetas tipo;
+    private final TipoSetas tipo;
     private ParallelTransition animacaoSubida;
     private final Runnable acaoErro;
 

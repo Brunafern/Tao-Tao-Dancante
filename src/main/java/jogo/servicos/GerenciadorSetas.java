@@ -9,13 +9,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-import jogo.componentes.PlacarDeVida;
 import jogo.componentes.Setas;
 
+import jogo.excecoes.ArquivoException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -33,7 +32,6 @@ public class GerenciadorSetas {
     private final AnchorPane painelPrincipal;
     private final Rectangle zonaAcerto;
     private final MediaPlayer audio;
-    private final PlacarDeVida placar;
     private final Runnable acaoFimDeFase;
 
     private final List<Setas> setasAtivas = new ArrayList<>();
@@ -47,27 +45,25 @@ public class GerenciadorSetas {
     private int[] sequenciaSetasFase;
     private int indiceSequencia = 0;
 
-    private LeitorJSONSimples.ConfiguracoesTempo configuracoesTempo;
 
     private Supplier<Double> fornecedorDuracaoAnimacao;
     private Consumer<Boolean> atualizadorPontuacao;
     private Runnable acaoAoIniciarSetas;
 
-    private final Random random = new Random();
+    // private final Random random = new Random();
 
     /**
      * @param painelPrincipal painel principal do jogo onde as setas serão exibidas
-     * @param zonaAcerto área da tela onde o jogador deve acertar as setas
-     * @param audio player da música da fase
-     * @param placar placar de vida do jogador
-     * @param acaoFimDeFase ação a executar ao terminar a fase
+     * @param zonaAcerto      área da tela onde o jogador deve acertar as setas
+     * @param audio           player da música da fase
+     * @param placar          placar de vida do jogador
+     * @param acaoFimDeFase   ação a executar ao terminar a fase
      */
     public GerenciadorSetas(AnchorPane painelPrincipal, Rectangle zonaAcerto,
-                            MediaPlayer audio, PlacarDeVida placar, Runnable acaoFimDeFase) {
+            MediaPlayer audio, Runnable acaoFimDeFase) {
         this.painelPrincipal = painelPrincipal;
         this.zonaAcerto = zonaAcerto;
         this.audio = audio;
-        this.placar = placar;
         this.acaoFimDeFase = acaoFimDeFase;
     }
 
@@ -75,48 +71,74 @@ public class GerenciadorSetas {
         this.jogoPausado = jogoPausado;
     }
 
-    public void setJogoTerminou(boolean jogoTerminou) { this.jogoTerminou = jogoTerminou; }
+    public void setJogoTerminou(boolean jogoTerminou) {
+        this.jogoTerminou = jogoTerminou;
+    }
 
     /**
      * @param numeroFase número da fase a carregar
      */
     public void carregarDadosDaFase(int numeroFase) {
-        this.sequenciaSetasFase = LeitorJSONSimples.carregarSequenciaSetas(numeroFase);
-        this.configuracoesTempo = LeitorJSONSimples.carregarConfiguracoesTempo(numeroFase);
-        this.indiceSequencia = 0;
+        try {
+            this.sequenciaSetasFase = LeitorJSONSimples.carregarSequenciaSetas(numeroFase);
+            this.indiceSequencia = 0;
+        } catch (ArquivoException e) {
+            System.err.println("Erro ao carregar dados da fase: " + e.getMessage());
+            e.printStackTrace();
+            this.sequenciaSetasFase = new int[0];
+        }
     }
 
-    public void setFornecedorDuracaoAnimacao(Supplier<Double> fornecedor) { this.fornecedorDuracaoAnimacao = fornecedor; }
+    public void setFornecedorDuracaoAnimacao(Supplier<Double> fornecedor) {
+        this.fornecedorDuracaoAnimacao = fornecedor;
+    }
 
-    public void setAtualizadorPontuacao(Consumer<Boolean> atualizador) { this.atualizadorPontuacao = atualizador; }
+    public void setAtualizadorPontuacao(Consumer<Boolean> atualizador) {
+        this.atualizadorPontuacao = atualizador;
+    }
 
-    public void setAcaoAoIniciarSetas(Runnable acao) { this.acaoAoIniciarSetas = acao; }
+    public void setAcaoAoIniciarSetas(Runnable acao) {
+        this.acaoAoIniciarSetas = acao;
+    }
 
-    public void setAcaoErro(Runnable acaoErro) { this.acaoErro = acaoErro; }
+    public void setAcaoErro(Runnable acaoErro) {
+        this.acaoErro = acaoErro;
+    }
 
-    public void setAcaoMiss(Runnable acaoMiss) { this.acaoMiss = acaoMiss; }
+    public void setAcaoMiss(Runnable acaoMiss) {
+        this.acaoMiss = acaoMiss;
+    }
 
-    public void iniciar() {
-        audio.setOnReady(() -> {
-            audio.play();
-            if (acaoAoIniciarSetas != null) acaoAoIniciarSetas.run();
-        });
-        audio.setOnEndOfMedia(acaoFimDeFase);
+    public void iniciar() throws jogo.excecoes.FluxoException {
+        try {
+            audio.setOnReady(() -> {
+                audio.play();
+                if (acaoAoIniciarSetas != null)
+                    acaoAoIniciarSetas.run();
+            });
+            audio.setOnEndOfMedia(acaoFimDeFase);
+        } catch (Exception e) {
+            throw new jogo.excecoes.FluxoException("Erro ao iniciar gerenciador de setas", e);
+        }
     }
 
     public void pararSetas() {
-        if (timelineSpawn != null) timelineSpawn.stop();
+        if (timelineSpawn != null)
+            timelineSpawn.stop();
         for (Setas seta : new ArrayList<>(setasAtivas)) {
             ParallelTransition animacao = seta.getAnimacaoSubida();
-            if (animacao != null && animacao.getStatus() == Animation.Status.RUNNING) animacao.stop();
+            if (animacao != null && animacao.getStatus() == Animation.Status.RUNNING)
+                animacao.stop();
             painelPrincipal.getChildren().remove(seta);
         }
         setasAtivas.clear();
     }
 
     public void gerarSeta() {
-        if (jogoTerminou || jogoPausado) return;
-        if (sequenciaSetasFase == null || indiceSequencia >= sequenciaSetasFase.length) return;
+        if (jogoTerminou || jogoPausado)
+            return;
+        if (sequenciaSetasFase == null || indiceSequencia >= sequenciaSetasFase.length)
+            return;
 
         Setas.TipoSetas tipo = Setas.TipoSetas.values()[sequenciaSetasFase[indiceSequencia++]];
         Setas novaSeta = new Setas(tipo, LARGURA_SETA, ALTURA_SETA, this::lidarComSetaPerdida);
@@ -128,7 +150,8 @@ public class GerenciadorSetas {
 
         double duracao = fornecedorDuracaoAnimacao != null ? fornecedorDuracaoAnimacao.get() : 3000;
         novaSeta.iniciarAnimacaoSubida(duracao, DISTANCIA_SUBIDA).setOnFinished(event -> {
-            if (novaSeta.isVisible()) novaSeta.lidarComErro(painelPrincipal, setasAtivas);
+            if (novaSeta.isVisible())
+                novaSeta.lidarComErro(painelPrincipal, setasAtivas);
         });
     }
 
@@ -145,13 +168,16 @@ public class GerenciadorSetas {
      * @param tecla tecla pressionada
      */
     public void processarTecla(KeyCode tecla) {
-        if (jogoTerminou) return;
+        if (jogoTerminou)
+            return;
 
         Setas.TipoSetas tipoTecla = obterTipoSetaPorTecla(tecla);
-        if (tipoTecla == null) return;
+        if (tipoTecla == null)
+            return;
 
         boolean acertou = tentarAcertarSeta(tipoTecla);
-        if (!acertou) lidarComErroDeAcerto(tipoTecla);
+        if (!acertou)
+            lidarComErroDeAcerto(tipoTecla);
     }
 
     private Setas.TipoSetas obterTipoSetaPorTecla(KeyCode tecla) {
@@ -184,7 +210,8 @@ public class GerenciadorSetas {
     }
 
     private void processarAcerto(Setas seta, Iterator<Setas> iterator) {
-        if (atualizadorPontuacao != null) atualizadorPontuacao.accept(true);
+        if (atualizadorPontuacao != null)
+            atualizadorPontuacao.accept(true);
 
         seta.aplicarEfeitoBrilho();
         PauseTransition delay = new PauseTransition(DURACAO_ESCONDER_SETA_APOS_BRILHO);
@@ -198,18 +225,30 @@ public class GerenciadorSetas {
     }
 
     private void lidarComErroDeAcerto(Setas.TipoSetas tipo) {
-        if (atualizadorPontuacao != null) atualizadorPontuacao.accept(false);
-        if (acaoErro != null) acaoErro.run();
+        if (atualizadorPontuacao != null)
+            atualizadorPontuacao.accept(false);
+        if (acaoErro != null)
+            acaoErro.run();
     }
 
     private void lidarComSetaPerdida() {
-        if (acaoMiss != null) acaoMiss.run();
-        if (atualizadorPontuacao != null) atualizadorPontuacao.accept(false);
+        if (acaoMiss != null)
+            acaoMiss.run();
+        if (atualizadorPontuacao != null)
+            atualizadorPontuacao.accept(false);
     }
 
-    public List<Setas> getSetasAtivas() { return setasAtivas; }
+    public List<Setas> getSetasAtivas() {
+        return setasAtivas;
+    }
 
-    public void pausaSpawn() { if (timelineSpawn != null) timelineSpawn.pause(); }
+    public void pausaSpawn() {
+        if (timelineSpawn != null)
+            timelineSpawn.pause();
+    }
 
-    public void retomaSpawn() { if (timelineSpawn != null) timelineSpawn.play(); }
+    public void retomaSpawn() {
+        if (timelineSpawn != null)
+            timelineSpawn.play();
+    }
 }

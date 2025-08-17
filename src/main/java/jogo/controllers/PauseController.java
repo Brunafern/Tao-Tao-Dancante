@@ -39,11 +39,8 @@ public class PauseController implements Initializable {
     public void setReprodutorMidia(MediaPlayer reprodutorMidia) {
         this.reprodutorMidia = reprodutorMidia;
 
-        System.out.println("🎵 setReprodutorMidia chamado!");
-
         if (controleVolume != null) {
             controleVolume.setReprodutorMidia(reprodutorMidia);
-            System.out.println("🔗 MediaPlayer conectado ao controle de volume");
         }
     }
 
@@ -85,15 +82,25 @@ public class PauseController implements Initializable {
     /**
      * @param evento Evento de ação do JavaFX.
      */
+
     @FXML
     private void voltarAoMenu(ActionEvent evento) {
-
-        gestorDePause.voltarParaMenu(evento);
+        try {
+            gestorDePause.voltarParaMenu(evento);
+        } catch (jogo.excecoes.RecursoException | jogo.excecoes.FluxoException e) {
+            System.err.println("Erro ao voltar para o menu: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
 
     @FXML
     private void sairDoJogo() {
-
-        gestorDePause.sairDoJogo();
+        try {
+            gestorDePause.sairDoJogo();
+        } catch (jogo.excecoes.RecursoException | jogo.excecoes.FluxoException e) {
+            System.err.println("Erro ao sair do jogo: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
