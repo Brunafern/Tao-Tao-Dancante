@@ -120,7 +120,7 @@ public abstract class FaseBase {
     // Configuração do Pause e listener do teclado usando apenas a interface
     protected void configurarPauseECaptureTeclado() {
         if (pause == null) {
-            pause = GestorDePause.getInstance(
+            pause = new GestorDePause(
                     telaFase,
                     bardo.getAnimacao(),
                     reprodutorMidia,
