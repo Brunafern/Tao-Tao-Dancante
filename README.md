@@ -10,6 +10,26 @@ Este é um jogo rítmico inspirado no **Friday Night Funkin'**, desenvolvido em 
 No controle de **Bardo**, um ogro corajoso e determinado, o jogador inicia em uma jornada para resgatar a princesa **Ruby**, sua esposa, que foi sequestrada por pretendentes ambiciosos. Esses rivais planejam forçá-la a um casamento com o intuito de assumir o trono do reino.
 Para libertá-la, Bardo deverá enfrentar seus adversários em batalhas musicais, onde a vitória depende da habilidade de acompanhar o ritmo e pressionar as teclas corretas no tempo exato.
 
+## 🎮 Como Jogar
+
+1. **Entenda o objetivo**  
+   - Seu desafio é acertar as setas que sobem na tela no **tempo certo** com as setas que aparecem no topo.  
+   - ⚠️ Se você **errar muitas vezes**, o inimigo vai vencer e a partida acaba.   
+
+3. **Controles básicos**  
+   - ⬆️⬇️⬅️➡️ Use as **setas do teclado** para acompanhar as setas que sobem na tela.  
+   - ⏸️ Pressione **ESC** para **pausar/retomar** o jogo.  
+
+4. **Barra de vida**  
+   - A pontuação é representada por uma **barra no canto inferior da tela**:  
+     - 🟩 **Verde** → você está ganhando.  
+     - 🟥 **Vermelha** → você está perdendo.  
+   - Seus acertos fazem a barra ficar mais **verde**.  
+   - Seus erros fazem a barra ficar mais **vermelha**.  
+
+5. **Dica**    
+   - 👀 Concentre-se na linha de acerto no topo da tela.  
+
 
 ## 🧪 Tecnologias utilizadas
 
