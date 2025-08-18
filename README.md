@@ -49,6 +49,26 @@ Se preferir rodar a aplicação sem configurar manualmente o caminho do JavaFX, 
 - **mvn javafx:run**
 
 
+## 📸 Prints da Interface
+
+### Tela de menu
+![Tela menu](https://i.imgur.com/6AgksoJ.png)
+
+### Tela de transição para a 1ª fase
+![Tela de batalha](https://i.imgur.com/FqbuNCN.png)
+
+### Tela da 1ª fase
+![Tela de vitória](https://i.imgur.com/dD9UQul.png)
+
+### Tela de pause
+![Tela de vitória](https://i.imgur.com/eWRoLhg.png)
+
+### Tela de vitória
+![Tela menu](https://i.imgur.com/iQmsYHg.png)
+
+### Tela de derrota
+![Tela menu](https://i.imgur.com/hyyx7m0.png)
+
 
 
 ## ✨ Créditos e agradecimentos
