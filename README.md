@@ -23,19 +23,25 @@ Para libertá-la, Bardo deverá enfrentar seus adversários em batalhas musicais
 
 ## 🕹️ Como Executar
 
+### Execute o arquivo abaixo
 
-### 1. Abrir o terminal
+-   --add-modules javafx.controls,javafx.fxml \
+  -jar target/demo-1.0-SNAPSHOT-jar-with-dependencies.jar
+
+### Caso não consiga rodar o arquivo, siga os passos abaixo
+
+#### 1. Abrir o terminal
 
 
-### 2. Navegar até a pasta do projeto
+#### 2. Navegar até a pasta do projeto
 - **cd /caminho/para/a/pasta/do/projeto**
 
 
-### 3. Compilar e empacotar o projeto (gera o arquivo JAR)
+#### 3. Compilar e empacotar o projeto (gera o arquivo JAR)
 - **mvn clean package**
 
 
-### 4.Executar a aplicação
+#### 4.Executar a aplicação
 - Substitua /caminho/para/javafx-sdk/lib pelo caminho da pasta lib do seu JavaFX SDK e rode o comando:
 
 
@@ -80,7 +86,7 @@ Desenvolvimento: Aline Mouzinho, Bruna Fernanda e Camila Dornelas
 Músicas: Criadas com Suno AI
 
 
-Assets gráficos: Adaptados e criados com auxílio de IA
+Assets gráficos: Adaptados no Photoshop CS6 e criados com auxílio de IA
 
 
 Inspiração: Filme Shrek e jogo Friday Night Funkin’
