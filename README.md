@@ -54,7 +54,7 @@ Se preferir rodar a aplicação sem configurar manualmente o caminho do JavaFX, 
 - **mvn javafx:run**
 
 
-## Estrutura do sistema
+## ⚙️ Estrutura do sistema
 ![](https://i.imgur.com/Mu8b1Hj.png)
 
 ## 📸 Prints da Interface
