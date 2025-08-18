@@ -20,7 +20,6 @@ Para libertá-la, Bardo deverá enfrentar seus adversários em batalhas musicais
 - Assets personalizados desenvolvidos para o projeto com ajuda de inteligência artificial
 - Música criada pelo Suno, inspirada na narrativa do jogo
 
-
 ## 🕹️ Como Executar
 
 ### Execute o arquivo abaixo
@@ -54,6 +53,9 @@ Para libertá-la, Bardo deverá enfrentar seus adversários em batalhas musicais
 Se preferir rodar a aplicação sem configurar manualmente o caminho do JavaFX, use o comando abaixo:
 - **mvn javafx:run**
 
+
+## Estrutura do sistema
+![](https://i.imgur.com/Mu8b1Hj.png)
 
 ## 📸 Prints da Interface
 
