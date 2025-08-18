@@ -1,6 +1,7 @@
 package jogo.servicos;
 
 import jogo.excecoes.ArquivoException;
+
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
@@ -38,7 +39,7 @@ public class LeitorJSONSimples {
 
     /**
      * @param numeroFase número da fase
-    * @return conteúdo do JSON como String; lança ArquivoException se não encontrado ou erro
+     * @return conteúdo do JSON como String; lança ArquivoException se não encontrado ou erro
      */
     private static String lerJSON(int numeroFase) throws ArquivoException {
         String nomeArquivo = "fase" + numeroFase + ".json";
@@ -118,30 +119,23 @@ public class LeitorJSONSimples {
         return Double.parseDouble(json.substring(inicioValor, fimValor).trim());
     }
 
-    public static class ConfiguracoesTempo {
-        public final double duracaoInicial;
-        public final double duracaoFinal;
-        public final double tempoAceleracao;
-
+    public record ConfiguracoesTempo(double duracaoInicial, double duracaoFinal, double tempoAceleracao) {
         /**
-         * @param duracaoInicial duração inicial das setas
-         * @param duracaoFinal   duração final das setas
+         * @param duracaoInicial  duração inicial das setas
+         * @param duracaoFinal    duração final das setas
          * @param tempoAceleracao tempo para acelerar de inicial para final
          */
-        public ConfiguracoesTempo(double duracaoInicial, double duracaoFinal, double tempoAceleracao) {
-            this.duracaoInicial = duracaoInicial;
-            this.duracaoFinal = duracaoFinal;
-            this.tempoAceleracao = tempoAceleracao;
+        public ConfiguracoesTempo {
         }
 
-        /**
-         * @param tempoAtual tempo atual em milissegundos
-         * @return duração interpolada
-         */
-        public double calcularDuracao(double tempoAtual) {
-            if (tempoAtual >= tempoAceleracao) return duracaoFinal;
-            double progresso = Math.min(1.0, tempoAtual / tempoAceleracao);
-            return duracaoInicial - ((duracaoInicial - duracaoFinal) * progresso);
+            /**
+             * @param tempoAtual tempo atual em milissegundos
+             * @return duração interpolada
+             */
+            public double calcularDuracao(double tempoAtual) {
+                if (tempoAtual >= tempoAceleracao) return duracaoFinal;
+                double progresso = Math.min(1.0, tempoAtual / tempoAceleracao);
+                return duracaoInicial - ((duracaoInicial - duracaoFinal) * progresso);
+            }
         }
-    }
 }

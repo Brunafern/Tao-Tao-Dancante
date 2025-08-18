@@ -1,9 +1,11 @@
 package jogo.controllers;
 
-import javafx.fxml.FXML;
-import javafx.event.ActionEvent;
+
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import principal.MainApplication;
+
 
 public class MenuController {
 

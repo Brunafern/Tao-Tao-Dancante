@@ -156,7 +156,7 @@ public abstract class FaseBase {
         pontuacao += deltaPontuacao;
         pontuacao = Math.max(0.0, Math.min(1.0, pontuacao));
 
-        placarDeVida.atualizar(pontuacao, lorde);
+        placarDeVida.atualizarPlacarDeVida(pontuacao, lorde);
 
         if (pontuacao <= 0) finalizarFase(false);
     }

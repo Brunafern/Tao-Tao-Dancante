@@ -16,9 +16,7 @@ public class MainApplication extends Application {
 
     /**
      * @param stage stage principal fornecido pelo JavaFX
-     * @throws IOException caso ocorra erro ao carregar o FXML do menu principal
      */
-
     @Override
     public void start(Stage stage) {
         mainStage = stage;
@@ -38,7 +36,6 @@ public class MainApplication extends Application {
             RecursoException excecao = new RecursoException("Erro ao carregar recursos iniciais: " + e.getMessage(), e);
             System.err.println(excecao.getMessage());
             excecao.printStackTrace();
-            // Aqui pode-se exibir um alerta para o usuário, se desejar
         }
     }
 

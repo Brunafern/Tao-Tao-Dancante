@@ -8,15 +8,17 @@ public abstract class Personagem extends ImageView {
 
     private static final int VIDAS_INICIAIS = 3;
     private static final double MULTIPLICADOR_INICIAL = 1.0;
-
     protected final String nome;
     protected int pontuacao;
     protected int vidas;
     protected boolean vivo;
+
     protected double multiplicadorPontos;
+
     /**
-     * @param width  largura do personagem (pixels)
-     * @param height altura do personagem (pixels)
+     * @param nome   Nome do personagem.
+     * @param width  Largura do personagem em pixels.
+     * @param height Altura do personagem em pixels.
      */
     public Personagem(String nome, double width, double height) throws PersonagemInvalidoException {
         this.nome = nome;
@@ -27,5 +29,4 @@ public abstract class Personagem extends ImageView {
         this.vivo = true;
         this.multiplicadorPontos = MULTIPLICADOR_INICIAL;
     }
-
 }
