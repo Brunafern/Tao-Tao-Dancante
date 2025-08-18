@@ -1,5 +1,6 @@
 package jogo.componentes;
 
+
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -8,13 +9,16 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import jogo.excecoes.ArquivoException;
+import jogo.excecoes.PersistenciaDadosException;
 import jogo.interfaces.GerenciadorPersistenciaVolumeInterface;
 import jogo.servicos.GerenciadorPersistenciaVolume;
-import jogo.excecoes.PersistenciaDadosException;
-import jogo.excecoes.ArquivoException;
+
 import java.util.Objects;
 
+
 public class ControleVolume extends StackPane {
+
 
     private static final double LARGURA_TOTAL = 150.0;
     private static final double ALTURA_TOTAL = 20.0;
@@ -23,8 +27,10 @@ public class ControleVolume extends StackPane {
     private static final double VOLUME_MAXIMO = 1.0;
     private static final double VOLUME_MINIMO = 0.0;
 
+
     private static final String COR_FUNDO_BARRA = "#F6FF9E";
     private static final String COR_PREENCHIMENTO_BARRA = "#93481A";
+
 
     private Rectangle barraFundo;
     private Rectangle barraPreenchimento;
@@ -32,31 +38,40 @@ public class ControleVolume extends StackPane {
     private MediaPlayer reprodutorMidia;
     private double volumeAtual;
 
+
     private final GerenciadorPersistenciaVolumeInterface gerenciadorPersistencia;
+
 
     public ControleVolume() {
         this.gerenciadorPersistencia = new GerenciadorPersistenciaVolume();
         this.volumeAtual = gerenciadorPersistencia.carregarVolume();
 
+
         inicializarInterface();
         configurarEventosInterativos();
     }
+
 
     private void inicializarInterface() {
         barraFundo = criarBarraFundo();
         barraPreenchimento = criarBarraPreenchimento();
         iconeVolume = criarIconeVolume();
 
+
         HBox layoutPrincipal = new HBox(0);
         layoutPrincipal.setAlignment(Pos.CENTER_LEFT);
+
 
         StackPane barraVolume = new StackPane();
         barraVolume.getChildren().addAll(barraFundo, barraPreenchimento);
 
+
         layoutPrincipal.getChildren().addAll(iconeVolume, barraVolume);
+
 
         this.getChildren().add(layoutPrincipal);
     }
+
 
     /**
      * @return Rectangle representando o fundo da barra de volume.
@@ -68,6 +83,7 @@ public class ControleVolume extends StackPane {
         return fundo;
     }
 
+
     /**
      * @return Rectangle representando a barra de preenchimento.
      */
@@ -77,6 +93,7 @@ public class ControleVolume extends StackPane {
         StackPane.setAlignment(preenchimento, Pos.CENTER_LEFT);
         return preenchimento;
     }
+
 
     /**
      * @return ImageView do ícone de volume.
@@ -92,14 +109,17 @@ public class ControleVolume extends StackPane {
             System.err.println(e.getMessage());
         }
 
+
         // Clique no ícone alterna entre mudo e volume máximo
         icone.setOnMouseClicked(event -> {
             event.consume();
             alternarMudo();
         });
 
+
         return icone;
     }
+
 
     /**
      * Configura eventos de clique e arrasto para ajuste do volume.
@@ -108,6 +128,7 @@ public class ControleVolume extends StackPane {
         this.setOnMouseClicked(event -> ajustarVolumePelaPosicao(event.getX()));
         this.setOnMouseDragged(event -> ajustarVolumePelaPosicao(event.getX()));
     }
+
 
     private void atualizarVisualBarra() {
         barraPreenchimento.setWidth(LARGURA_TOTAL * volumeAtual);
@@ -118,6 +139,7 @@ public class ControleVolume extends StackPane {
         }
     }
 
+
     private void atualizarImagemIconeVolume() throws ArquivoException {
         String caminhoIcone = obterCaminhoIcone();
         try {
@@ -127,6 +149,7 @@ public class ControleVolume extends StackPane {
             throw new ArquivoException("Erro ao carregar imagem do ícone de volume: " + caminhoIcone, erro);
         }
     }
+
 
     /**
      * @return Caminho relativo da imagem do ícone de volume.
@@ -141,6 +164,7 @@ public class ControleVolume extends StackPane {
         }
     }
 
+
     public void alternarMudo() {
         if (volumeAtual > VOLUME_MINIMO) {
             definirVolume(VOLUME_MINIMO);
@@ -149,6 +173,7 @@ public class ControleVolume extends StackPane {
         }
     }
 
+
     /**
      * @param posicaoX Posição X do evento na barra.
      */
@@ -156,6 +181,7 @@ public class ControleVolume extends StackPane {
         double novoVolume = Math.max(VOLUME_MINIMO, Math.min(VOLUME_MAXIMO, posicaoX / LARGURA_TOTAL));
         definirVolume(novoVolume);
     }
+
 
     /**
      * @param reprodutorMidia Instância de MediaPlayer do JavaFX.
@@ -167,6 +193,7 @@ public class ControleVolume extends StackPane {
         }
     }
 
+
     /**
      * @param volume Valor do volume (0.0 a 1.0)
      */
@@ -174,12 +201,13 @@ public class ControleVolume extends StackPane {
         this.volumeAtual = Math.max(VOLUME_MINIMO, Math.min(VOLUME_MAXIMO, volume));
         atualizarVisualBarra();
 
+
         if (reprodutorMidia != null) {
             reprodutorMidia.setVolume(this.volumeAtual);
         }
         try {
             gerenciadorPersistencia.salvarVolume(this.volumeAtual);
-    } catch (PersistenciaDadosException e) {
+        } catch (PersistenciaDadosException e) {
             System.err.println("Erro ao salvar volume: " + e.getMessage());
         }
     }

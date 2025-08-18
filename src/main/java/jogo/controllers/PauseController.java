@@ -1,5 +1,7 @@
 package jogo.controllers;
 
+
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.AnchorPane;
@@ -7,7 +9,6 @@ import javafx.scene.media.MediaPlayer;
 import jogo.componentes.ControleVolume;
 import jogo.interfaces.PauseInterface;
 
-import javafx.event.ActionEvent;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -24,16 +25,13 @@ public class PauseController implements Initializable {
     private AnchorPane telaPause;
 
     /**
-     * Define o Gestor de Pause responsável pelas ações de voltar, sair ou ir ao menu.
      * @param gestorDePause Instância do GestorDePause.
      */
     public void setGestorDePause(PauseInterface gestorDePause) {
-
         this.gestorDePause = gestorDePause;
     }
 
     /**
-     * Define o MediaPlayer que será controlado pelo ControleVolume.
      * @param reprodutorMidia MediaPlayer do JavaFX.
      */
     public void setReprodutorMidia(MediaPlayer reprodutorMidia) {
@@ -45,8 +43,6 @@ public class PauseController implements Initializable {
     }
 
     /**
-     * Metodo chamado automaticamente pelo JavaFX após a injeção do FXML.
-     * Inicializa a tela de pausa, criando o ControleVolume conectando o MediaPlayer
      * @param location  URL usada para resolver caminhos relativos (geralmente não usado)
      * @param resources Recursos localizados, se houver (geralmente não usado)
      */
@@ -75,14 +71,12 @@ public class PauseController implements Initializable {
 
     @FXML
     private void voltarAoJogo() {
-
         gestorDePause.voltar();
     }
 
     /**
      * @param evento Evento de ação do JavaFX.
      */
-
     @FXML
     private void voltarAoMenu(ActionEvent evento) {
         try {
@@ -92,7 +86,6 @@ public class PauseController implements Initializable {
             e.printStackTrace();
         }
     }
-
 
     @FXML
     private void sairDoJogo() {

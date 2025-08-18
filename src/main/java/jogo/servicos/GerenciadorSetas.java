@@ -10,8 +10,8 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import jogo.componentes.Setas;
-
 import jogo.excecoes.ArquivoException;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,7 +20,6 @@ import java.util.function.Supplier;
 
 public class GerenciadorSetas {
 
-    // Constantes de dimensões e posições
     private static final double START_X = 300.0;
     private static final double ESPACAMENTO = 165.0;
     private static final double LARGURA_SETA = 190.0;
@@ -45,38 +44,40 @@ public class GerenciadorSetas {
     private int[] sequenciaSetasFase;
     private int indiceSequencia = 0;
 
-
     private Supplier<Double> fornecedorDuracaoAnimacao;
     private Consumer<Boolean> atualizadorPontuacao;
     private Runnable acaoAoIniciarSetas;
 
-    // private final Random random = new Random();
-
     /**
-     * @param painelPrincipal painel principal do jogo onde as setas serão exibidas
-     * @param zonaAcerto      área da tela onde o jogador deve acertar as setas
-     * @param audio           player da música da fase
-     * @param placar          placar de vida do jogador
-     * @param acaoFimDeFase   ação a executar ao terminar a fase
+     * @param painelPrincipal painel onde as setas serão adicionadas
+     * @param zonaAcerto área da tela onde o jogador deve acertar as setas
+     * @param audio player da música da fase
+     * @param acaoFimDeFase ação a executar ao término da fase
      */
     public GerenciadorSetas(AnchorPane painelPrincipal, Rectangle zonaAcerto,
-            MediaPlayer audio, Runnable acaoFimDeFase) {
+                            MediaPlayer audio, Runnable acaoFimDeFase) {
         this.painelPrincipal = painelPrincipal;
         this.zonaAcerto = zonaAcerto;
         this.audio = audio;
         this.acaoFimDeFase = acaoFimDeFase;
     }
 
+    /**
+     * @param jogoPausado true para pausar, false para continuar
+     */
     public void setJogoPausado(boolean jogoPausado) {
         this.jogoPausado = jogoPausado;
     }
 
+    /**
+     * @param jogoTerminou true se jogo terminou, false caso contrário
+     */
     public void setJogoTerminou(boolean jogoTerminou) {
         this.jogoTerminou = jogoTerminou;
     }
 
     /**
-     * @param numeroFase número da fase a carregar
+     * @param numeroFase número da fase a ser carregada
      */
     public void carregarDadosDaFase(int numeroFase) {
         try {
@@ -89,26 +90,44 @@ public class GerenciadorSetas {
         }
     }
 
+    /**
+     * @param fornecedor função que retorna a duração em milissegundos
+     */
     public void setFornecedorDuracaoAnimacao(Supplier<Double> fornecedor) {
         this.fornecedorDuracaoAnimacao = fornecedor;
     }
 
+    /**
+     * @param atualizador consumidor da atualização da pontuação
+     */
     public void setAtualizadorPontuacao(Consumer<Boolean> atualizador) {
         this.atualizadorPontuacao = atualizador;
     }
 
+    /**
+     * @param acao ação a executar no início das setas
+     */
     public void setAcaoAoIniciarSetas(Runnable acao) {
         this.acaoAoIniciarSetas = acao;
     }
 
+    /**
+     * @param acaoErro ação a executar ao errar
+     */
     public void setAcaoErro(Runnable acaoErro) {
         this.acaoErro = acaoErro;
     }
 
+    /**
+     * @param acaoMiss ação a executar em caso de miss
+     */
     public void setAcaoMiss(Runnable acaoMiss) {
         this.acaoMiss = acaoMiss;
     }
 
+    /**
+     * @throws jogo.excecoes.FluxoException caso ocorra erro na inicialização
+     */
     public void iniciar() throws jogo.excecoes.FluxoException {
         try {
             audio.setOnReady(() -> {
@@ -155,6 +174,10 @@ public class GerenciadorSetas {
         });
     }
 
+    /**
+     * @param tipo tipo da seta
+     * @return posição X para a seta
+     */
     private double calcularPosicaoX(Setas.TipoSetas tipo) {
         return switch (tipo) {
             case LEFT -> START_X - 10;
@@ -180,6 +203,10 @@ public class GerenciadorSetas {
             lidarComErroDeAcerto(tipoTecla);
     }
 
+    /**
+     * @param tecla tecla pressionada
+     * @return tipo de seta correspondente ou null se tecla inválida
+     */
     private Setas.TipoSetas obterTipoSetaPorTecla(KeyCode tecla) {
         return switch (tecla) {
             case LEFT -> Setas.TipoSetas.LEFT;
@@ -190,6 +217,10 @@ public class GerenciadorSetas {
         };
     }
 
+    /**
+     * @param tipo tipo da seta que o jogador tentou acertar
+     * @return true se acertou alguma seta, false caso contrário
+     */
     private boolean tentarAcertarSeta(Setas.TipoSetas tipo) {
         Iterator<Setas> iterator = setasAtivas.iterator();
         while (iterator.hasNext()) {
@@ -202,6 +233,10 @@ public class GerenciadorSetas {
         return false;
     }
 
+    /**
+     * @param seta seta a verificar
+     * @return true se a seta está dentro da zona de acerto
+     */
     private boolean estaNaZonaDeAcerto(Setas seta) {
         double y = seta.getLayoutY() + seta.getTranslateY();
         double topoZona = zonaAcerto.getLayoutY();
@@ -209,6 +244,10 @@ public class GerenciadorSetas {
         return y + seta.getFitHeight() >= topoZona && y <= baseZona;
     }
 
+    /**
+     * @param seta     seta que foi acertada
+     * @param iterator iterator da lista para remoção segura da seta
+     */
     private void processarAcerto(Setas seta, Iterator<Setas> iterator) {
         if (atualizadorPontuacao != null)
             atualizadorPontuacao.accept(true);
@@ -224,6 +263,9 @@ public class GerenciadorSetas {
         iterator.remove();
     }
 
+    /**
+     * @param tipo tipo da seta errada pressionada
+     */
     private void lidarComErroDeAcerto(Setas.TipoSetas tipo) {
         if (atualizadorPontuacao != null)
             atualizadorPontuacao.accept(false);
@@ -238,6 +280,9 @@ public class GerenciadorSetas {
             atualizadorPontuacao.accept(false);
     }
 
+    /**
+     * @return lista de setas ativas
+     */
     public List<Setas> getSetasAtivas() {
         return setasAtivas;
     }

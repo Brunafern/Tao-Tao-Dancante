@@ -3,6 +3,7 @@ package jogo.servicos;
 import javafx.animation.Animation;
 import javafx.animation.ParallelTransition;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -11,14 +12,14 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
+import jogo.componentes.Setas;
 import jogo.controllers.PauseController;
-import jogo.excecoes.RecursoException;
 import jogo.excecoes.FluxoException;
-import javafx.event.ActionEvent;
+import jogo.excecoes.RecursoException;
+import jogo.interfaces.PauseInterface;
+
 import java.io.IOException;
 import java.util.List;
-import jogo.componentes.Setas;
-import jogo.interfaces.PauseInterface;
 
 public class GestorDePause  implements PauseInterface {
 
@@ -44,8 +45,8 @@ public class GestorDePause  implements PauseInterface {
      * @param gerenciadorSetas gerenciador de setas
      */
     public GestorDePause(Pane painelPrincipal, Timeline animacoes, MediaPlayer reprodutorMidia,
-            List<Setas> setasAtivas, Runnable acaoRetornarJogo,
-            GerenciadorSetas gerenciadorSetas) {
+                         List<Setas> setasAtivas, Runnable acaoRetornarJogo,
+                         GerenciadorSetas gerenciadorSetas) {
         this.painelPrincipal = painelPrincipal;
         this.animacoes = animacoes;
         this.reprodutorMidia = reprodutorMidia;
@@ -63,8 +64,8 @@ public class GestorDePause  implements PauseInterface {
      * @return instância única de {@link GestorDePause}
      */
     public static GestorDePause getInstance(Pane painelPrincipal, Timeline animacoes, MediaPlayer reprodutorMidia,
-            List<Setas> setasAtivas, Runnable acaoRetornarJogo,
-            GerenciadorSetas gerenciadorSetas) {
+                                            List<Setas> setasAtivas, Runnable acaoRetornarJogo,
+                                            GerenciadorSetas gerenciadorSetas) {
         if (instancia == null) {
             instancia = new GestorDePause(painelPrincipal, animacoes, reprodutorMidia, setasAtivas, acaoRetornarJogo,
                     gerenciadorSetas);

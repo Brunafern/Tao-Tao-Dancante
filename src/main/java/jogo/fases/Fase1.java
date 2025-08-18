@@ -5,14 +5,13 @@ import javafx.animation.Timeline;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import jogo.excecoes.ArquivoException;
 import jogo.personagens.Bardo;
 import jogo.personagens.Lorde;
 import jogo.servicos.LeitorJSONSimples;
-import jogo.excecoes.ArquivoException;
 
 public class Fase1 extends FaseBase {
 
-    // Constantes para as posições e dimensões dos personagens
     private static final double BARDO_POSICAO_X = 890.0;
     private static final double BARDO_POSICAO_Y = 335.0;
     private static final double LORDE_POSICAO_X = 120.0;
@@ -22,7 +21,6 @@ public class Fase1 extends FaseBase {
     private static final double LORDE_LARGURA = 210.0;
     private static final double LORDE_ALTURA = 380.0;
 
-    // Constantes para lógica de spawn e animação de setas
     private static final double DURACAO_SPAWN_SETA_MILLIS = 1200.0;
     private static final double DURACAO_SUBIDA_INICIAL_BACKUP = 6000.0;
     private static final double DURACAO_SUBIDA_FINAL_BACKUP = 3000.0;
@@ -37,12 +35,15 @@ public class Fase1 extends FaseBase {
 
     private Timeline timelineSpawn;
 
+    /**
+     * @throws jogo.excecoes.FluxoException se ocorrer erro ao carregar dados da fase.
+     */
     public Fase1() throws jogo.excecoes.FluxoException {
         try {
             this.caminhoMusica = LeitorJSONSimples.carregarCaminhoMusica(1);
             this.configuracoesTempo = LeitorJSONSimples.carregarConfiguracoesTempo(1);
-    } catch (ArquivoException e) {
-            System.err.println("Erro ao carregar dados da fase 1: " + e.getMessage());
+        } catch (ArquivoException e) {
+            throw new jogo.excecoes.FluxoException("Erro ao carregar dados da fase 1: " + e.getMessage(), e);
         } catch (Exception e) {
             throw new jogo.excecoes.FluxoException("Erro ao inicializar Fase 1", e);
         }
@@ -51,7 +52,6 @@ public class Fase1 extends FaseBase {
 
     @Override
     protected void inicializarBackground() {
-
         definirBackground(imagemBackground);
     }
 
@@ -69,13 +69,20 @@ public class Fase1 extends FaseBase {
             telaFase.getChildren().add(lorde);
 
         } catch (Exception e) {
-            System.err.println(" Erro ao criar personagens: " + e.getMessage());
+            System.err.println("Erro ao criar personagens: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     @Override
     protected void inicializarMusica() {
-        String musicaPath = getClass().getResource(caminhoMusica).toExternalForm();
+        var recursoMusica = getClass().getResource(caminhoMusica);
+        if (recursoMusica == null) {
+            System.err.println("Recurso de música não encontrado: " + caminhoMusica);
+            return;
+        }
+
+        String musicaPath = recursoMusica.toExternalForm();
         Media media = new Media(musicaPath);
         reprodutorMidia = new MediaPlayer(media);
 
@@ -95,7 +102,7 @@ public class Fase1 extends FaseBase {
 
         try {
             gerenciadorSetas.iniciar();
-    } catch (jogo.excecoes.FluxoException e) {
+        } catch (jogo.excecoes.FluxoException e) {
             System.err.println("Erro ao iniciar gerenciador de setas: " + e.getMessage());
             e.printStackTrace();
         }
@@ -103,6 +110,10 @@ public class Fase1 extends FaseBase {
 
     private void iniciarSpawnSetas() {
         gerenciadorSetas.pararSetas();
+
+        if (timelineSpawn != null) {
+            timelineSpawn.stop();
+        }
 
         timelineSpawn = new Timeline(new KeyFrame(Duration.millis(DURACAO_SPAWN_SETA_MILLIS), e -> {
             if (reprodutorMidia != null) {
@@ -124,7 +135,7 @@ public class Fase1 extends FaseBase {
     }
 
     /**
-     * @return duração da animação da seta em milissegundos
+     * @return duração em milissegundos
      */
     private double calcularDuracaoSeta() {
         if (reprodutorMidia == null) {
@@ -140,6 +151,7 @@ public class Fase1 extends FaseBase {
         if (tempoAtual >= TEMPO_ACELERACAO_BACKUP) {
             return DURACAO_APOS_ACELERACAO_BACKUP;
         }
+
         double progresso = Math.min(1.0, tempoAtual / TEMPO_ACELERACAO_BACKUP);
         return DURACAO_SUBIDA_INICIAL_BACKUP - ((DURACAO_SUBIDA_INICIAL_BACKUP - DURACAO_SUBIDA_FINAL_BACKUP) * progresso);
     }

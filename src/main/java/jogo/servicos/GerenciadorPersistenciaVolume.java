@@ -12,9 +12,7 @@ import java.util.prefs.Preferences;
 public class GerenciadorPersistenciaVolume implements GerenciadorPersistenciaVolumeInterface {
 
     private static final String CHAVE_VOLUME = "volume_jogo";
-
     private static final double VOLUME_PADRAO = 1.0;
-
     private final Preferences prefs;
 
     public GerenciadorPersistenciaVolume() {
@@ -34,7 +32,7 @@ public class GerenciadorPersistenciaVolume implements GerenciadorPersistenciaVol
     }
 
     /**
-     * @return volume entre 0.0 e 1.0.
+     * @return volume carregado entre 0.0 e 1.0; retorna 1.0 se não encontrado ou erro.
      */
     public double carregarVolume() {
         try {

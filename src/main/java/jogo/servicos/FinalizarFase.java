@@ -1,8 +1,5 @@
 package jogo.servicos;
 
-import javafx.fxml.Initializable;
-import jogo.excecoes.RecursoException;
-import jogo.excecoes.FluxoException;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,28 +8,14 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import jogo.excecoes.FluxoException;
+import jogo.excecoes.RecursoException;
 import jogo.interfaces.FinalizarFaseInterface;
 
 public class FinalizarFase implements FinalizarFaseInterface {
 
     /**
-     * @param stage   palco principal da aplicação (onde a cena será carregada).
-     * @param vitoria true se o jogador venceu a fase, false caso tenha perdido.
-     */
-    public void finalizarFase(Stage stage, boolean vitoria) throws RecursoException, FluxoException {
-        try {
-            tocarSom(vitoria);
-            carregarTelaFinal(stage, vitoria);
-    } catch (RecursoException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new FluxoException("Erro inesperado ao finalizar fase", e);
-        }
-    }
-
-    /**
-     * @param vitoria true para tocar música de vitória, false para música de
-     *                derrota.
+     * @param vitoria True para música de vitória; false para música de derrota.
      */
     private static void tocarSom(boolean vitoria) throws RecursoException {
         String soundFile = vitoria ? "victory-.mp3" : "losetrumpet.mp3";
@@ -50,9 +33,8 @@ public class FinalizarFase implements FinalizarFaseInterface {
     }
 
     /**
-     * @param stage   palco principal da aplicação.
-     * @param vitoria true para carregar a tela de vitória, false para tela de
-     *                derrota.
+     * @param stage   Palco principal da aplicação onde a cena será exibida.
+     * @param vitoria True para carregar tela de vitória; false para tela de derrota.
      */
     private static void carregarTelaFinal(Stage stage, boolean vitoria) throws RecursoException {
         try {
@@ -70,6 +52,21 @@ public class FinalizarFase implements FinalizarFaseInterface {
             stage.show();
         } catch (Exception e) {
             throw new RecursoException("Erro ao carregar tela final: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * @param stage   Palco principal da aplicação onde a cena será exibida.
+     * @param vitoria True se o jogador venceu a fase; false se perdeu.
+     */
+    public void finalizarFase(Stage stage, boolean vitoria) throws RecursoException, FluxoException {
+        try {
+            tocarSom(vitoria);
+            carregarTelaFinal(stage, vitoria);
+        } catch (RecursoException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FluxoException("Erro inesperado ao finalizar fase", e);
         }
     }
 }

@@ -1,11 +1,11 @@
 package jogo.personagens;
 
-import jogo.excecoes.PlacarDeVidaException;
-import jogo.excecoes.PersonagemInvalidoException;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
+import jogo.excecoes.PersonagemInvalidoException;
+import jogo.excecoes.PlacarDeVidaException;
 
 public class Bardo extends Personagem {
 
@@ -21,7 +21,8 @@ public class Bardo extends Personagem {
     /**
      * @param largura largura do personagem em pixels
      * @param altura  altura do personagem em pixels
-     * @throws PlacarDeVidaException se algum parâmetro for inválido
+     * @throws PersonagemInvalidoException se o personagem for inválido
+     * @throws PlacarDeVidaException se houver problema relacionado à lógica de vida
      */
     public Bardo(double largura, double altura) throws PersonagemInvalidoException, PlacarDeVidaException {
         super("Bardo", largura, altura);
@@ -31,7 +32,6 @@ public class Bardo extends Personagem {
 
         this.setImage(imagemPadrao);
 
-        // Configura animação contínua alternando frames
         this.animacao = new Timeline(
                 new KeyFrame(Duration.millis(DURACAO_KEYFRAME_MILLIS), e -> alternarFrame()));
         this.animacao.setCycleCount(Timeline.INDEFINITE);
@@ -47,10 +47,9 @@ public class Bardo extends Personagem {
     }
 
     /**
-     * @return Timeline da animação contínua
+     * @return Timeline representando a animação em loop do personagem
      */
     public Timeline getAnimacao() {
         return animacao;
     }
-
 }
